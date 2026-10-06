@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: menu
-    env: docker
-    region: oregon
-    plan: free
-    branch: main
