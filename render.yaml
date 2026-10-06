@@ -4,5 +4,4 @@ services:
     env: docker
     region: oregon
     plan: free
-    repo: https://github.com/Homes4077/menu.git
     branch: main
