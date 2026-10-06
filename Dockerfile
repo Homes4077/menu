@@ -2,6 +2,7 @@
 FROM mcr.microsoft.com/openjdk/jdk:21-ubuntu AS build
 WORKDIR /app
 COPY . .
+RUN chmod +x ./mvnw
 RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Minimal runtime using Microsoft OpenJDK 21
