@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Paleo Hotel & Spa — Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep: #091315;
+            --lagoon: #132b2a;
+            --bone: #f5eedc;
+            --gold: #ffb627;
+            --gold-glow: rgba(255, 182, 39, 0.35);
+            --muted: #a1b5ac;
+            --line: rgba(245, 238, 220, 0.12);
+            --p: min(62vw, 260px);
+        }
+
+        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+        html{background:var(--deep);height:100%}
+        body{
+            min-height:100%;min-height:100dvh;color:var(--bone);font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+            background:radial-gradient(80% 50% at 50% 0%, rgba(255,182,39,0.12), transparent 70%),
+            radial-gradient(100% 60% at 0% 100%, rgba(22,48,47,0.4), transparent 70%), var(--deep);
+            display:flex;justify-content:center;overflow-x:hidden;
+            padding-top:env(safe-area-inset-top);
+            padding-bottom:env(safe-area-inset-bottom);
+        }
+
+        .ambient-glow {
+            position: fixed; top: 15%; left: 50%; transform: translate(-50%, -50%);
+            width: calc(var(--p) * 1.4); height: calc(var(--p) * 1.4); border-radius: 50%;
+            background: radial-gradient(circle, var(--gold-glow) 0%, transparent 70%);
+            filter: blur(50px); pointer-events: none; z-index: 0; opacity: 0.8;
+        }
+
+        .app{
+            width:min(100%,480px);min-height:100dvh;display:flex;flex-direction:column;
+            padding:16px 0 calc(110px + env(safe-area-inset-bottom, 0px));position:relative;z-index:1;
+        }
+        :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:8px}
+        button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+        /* Masthead */
+        .brand{padding:0 20px;display:flex;align-items:center;justify-space-between:space-between}
+        .brand h1{
+            font-family:'Fraunces',serif;font-weight:800;font-size:2.5rem;line-height:1;letter-spacing:-.03em;
+            background: linear-gradient(135deg, #ffffff 30%, var(--gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-variation-settings:'SOFT' 100,'WONK' 1,'opsz' 144
+        }
+        .brand span.sub{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;font-weight:600;display:block}
+
+        .admin-link{
+            font-size:.72rem;color:var(--gold);text-transform:uppercase;letter-spacing:.12em;font-weight:700;
+            text-decoration:none;border:1px solid rgba(255,182,39,0.3);padding:7px 12px;border-radius:99px;
+            background:rgba(255,182,39,0.08);transition:all .2s;white-space:nowrap;
+        }
+        .admin-link:hover{background:rgba(255,182,39,0.2);border-color:var(--gold)}
+
+        .tabs{display:flex;gap:8px;padding:16px 20px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+        .tabs::-webkit-scrollbar{display:none}
+        .tab{
+            padding:9px 16px;border-radius:99px;border:1px solid var(--line);
+            background: rgba(255,255,255,0.03); backdrop-filter: blur(10px);
+            font-size:.85rem;font-weight:600;white-space:nowrap;transition:all .3s cubic-bezier(.2,1,.3,1)
+        }
+        .tab[aria-selected=true]{
+            background:var(--bone);color:var(--deep);border-color:var(--bone);
+            box-shadow: 0 4px 20px rgba(245, 238, 220, 0.25); transform: translateY(-1px);
+        }
+
+        /* Plate Wheel */
+        .stage{position:relative;height:calc(var(--p)*1.35);margin-top:5px}
+        .ring{position:absolute;left:50%;top:50%;width:calc(var(--p)*1.36);height:calc(var(--p)*1.36);margin:calc(var(--p)*-.68) 0 0 calc(var(--p)*-.68);pointer-events:none;will-change:transform;transition:transform 0.4s cubic-bezier(.2,1,.3,1)}
+        .ring text{font-family:'Fraunces',serif;font-size:18px;font-style:italic;fill:var(--gold);opacity:.85;letter-spacing:2px}
+        .track{
+            position:absolute;inset:0;display:flex;align-items:center;gap:0;
+            overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
+            padding-inline:calc(50% - var(--p)/2);-webkit-overflow-scrolling:touch;
+        }
+        .track::-webkit-scrollbar{display:none}
+        .slide{
+            flex:none;width:var(--p);height:var(--p);border-radius:50%;scroll-snap-align:center;padding:0;
+            box-shadow:0 0 0 1px rgba(255,182,39,0.3), 0 0 25px -5px rgba(0,0,0,0.8), 0 20px 40px -15px rgba(0,0,0,0.9);
+            position:relative; transition: transform .3s ease;
+        }
+        .slide img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;background:var(--lagoon)}
+
+        /* Dish details */
+        .info{padding:8px 20px 0;text-align:center;min-height:200px}
+        .info.in{animation:swap .4s cubic-bezier(.16,1,.3,1) both}
+        @keyframes swap{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+        .count{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-weight:600;margin-bottom:6px}
+        .info h2{font-family:'Fraunces',serif;font-weight:700;font-size:1.65rem;line-height:1.1;letter-spacing:-.01em;font-variation-settings:'SOFT' 100,'opsz' 72;text-wrap:balance}
+        .info p{color:var(--muted);font-size:.88rem;line-height:1.5;margin:8px auto 0;max-width:32ch}
+        .buy{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:16px}
+        .price{font-family:'Fraunces',serif;font-weight:700;font-size:1.3rem;color:var(--gold)}
+        .add{
+            background:linear-gradient(135deg, #ffc44d, var(--gold));color:#140f02;font-weight:700;
+            padding:12px 24px;border-radius:99px;font-size:.88rem;
+            box-shadow:0 6px 20px rgba(255, 182, 39, 0.3);transition:transform .15s
+        }
+        .add:active{transform:scale(.95)}
+        .step{display:inline-flex;align-items:center;background:rgba(255,182,39,0.1);border:1px solid var(--gold);border-radius:99px}
+        .step button{width:40px;height:40px;font-size:1.1rem;color:var(--gold);font-weight:700}
+        .step b{min-width:26px;text-align:center;font-weight:700;font-size:.95rem}
+        .nav{display:flex;justify-content:center;gap:12px;margin-top:14px}
+        .nav button{
+            width:38px;height:38px;border-radius:50%;border:1px solid var(--line);
+            background:rgba(255,255,255,0.03);backdrop-filter:blur(8px);font-size:.9rem;transition:background .2s
+        }
+        .nav button:not(:disabled):active{background:var(--line)}
+        .nav button:disabled{opacity:.2;cursor:default}
+
+        /* Order Tray */
+        .tray{
+            position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));
+            transform:translate(-50%,180%);width:min(calc(100% - 24px),448px);
+            display:flex;justify-content:space-between;align-items:center;padding:15px 20px;border-radius:24px;
+            background:var(--bone);color:var(--deep);font-weight:700;
+            box-shadow:0 20px 50px -10px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,0.4) inset;
+            transition:transform .4s cubic-bezier(.175,.885,.32,1.275);z-index:100
+        }
+        .tray.show{transform:translate(-50%,0)}
+        .tray small{font-weight:600;opacity:.7;display:block;font-size:.74rem;margin-top:1px}
+
+        /* Dialog */
+        dialog{
+            margin:auto auto 0;width:100%;max-width:480px;max-height:85dvh;overflow-y:auto;border:0;
+            border-radius:28px 28px 0 0;background:#112224;color:var(--bone);
+            padding:24px 20px calc(24px + env(safe-area-inset-bottom,0px));
+            box-shadow:0 -10px 40px rgba(0,0,0,0.5);border-top:1px solid var(--line);
+        }
+        dialog::backdrop{background:rgba(3,10,11,.75);backdrop-filter:blur(8px)}
+        dialog h3{font-family:'Fraunces',serif;font-weight:700;font-size:1.5rem;font-variation-settings:'SOFT' 100;margin-bottom:12px}
+        .line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+        .line div{flex:1;font-size:.9rem;font-weight:600}.line small{color:var(--muted);display:block;font-size:.78rem;font-weight:400;margin-top:2px}
+        .total{display:flex;justify-content:space-between;font-weight:700;font-size:1.05rem;padding:16px 0 6px}
+        .close{display:block;width:100%;background:rgba(255,255,255,0.05);color:var(--bone);border:1px solid var(--line);margin-top:16px;padding:14px;border-radius:16px;font-size:.92rem;font-weight:700;cursor:pointer}
+        .empty-msg{color:var(--muted);text-align:center;padding:30px 20px;font-size:.9rem}
+        [hidden]{display:none!important}
+    </style>
+</head>
+<body>
+
+<div class="ambient-glow" id="ambientGlow"></div>
+
+<div class="app">
+    <header class="brand">
+        <div>
+            <h1>Paleo</h1>
+            <span class="sub">Hotel &amp; Spa</span>
+        </div>
+        <a href="admin.html" class="admin-link">Admin Console</a>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Menu sections">
+        <button class="tab" role="tab" data-view="morning" aria-selected="true">Morning</button>
+        <button class="tab" role="tab" data-view="starter" aria-selected="false">Starters</button>
+        <button class="tab" role="tab" data-view="main" aria-selected="false">Mains</button>
+        <button class="tab" role="tab" data-view="dessert" aria-selected="false">Desserts</button>
+        <button class="tab" role="tab" data-view="soft drinks" aria-selected="false">Soft Drinks</button>
+        <button class="tab" role="tab" data-view="liquour" aria-selected="false">Liquor</button>
+    </nav>
+
+    <main id="menuView">
+        <div class="stage">
+            <svg class="ring" id="ring" viewBox="0 0 400 400" aria-hidden="true">
+                <defs><path id="circ" d="M200,200 m-170,0 a170,170 0 1,1 340,0 a170,170 0 1,1 -340,0"/></defs>
+                <text><textPath href="#circ" id="ringText" lengthAdjust="spacing" textLength="1060"></textPath></text>
+            </svg>
+            <div class="track" id="track" tabindex="0" aria-label="Dishes, swipe sideways"></div>
+        </div>
+        <section class="info" id="info" aria-live="polite">
+            <div class="count" id="count"></div>
+            <h2 id="dName"></h2>
+            <p id="dDesc"></p>
+            <div class="buy">
+                <span class="price" id="dPrice"></span>
+                <span id="ctl"></span>
+            </div>
+            <div class="nav">
+                <button id="prev" aria-label="Previous dish">&#8592;</button>
+                <button id="next" aria-label="Next dish">&#8594;</button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<button class="tray" id="tray"><span id="trayL"></span><span id="trayR"></span></button>
+
+<dialog id="sheet">
+    <h3>Your Selection</h3>
+    <div id="lines"></div>
+    <div class="total"><span>Total</span><span id="sheetTotal"></span></div>
+    <button class="close" id="sheetClose">Close Summary</button>
+</dialog>
+
+<script>
+    let MENU = {
+        morning: { title: "morning feasts", items: [] },
+        starter: { title: "starters", items: [] },
+        main: { title: "gourmet mains", items: [] },
+        dessert: { title: "sweet desserts", items: [] },
+        "soft drinks": { title: "soft beverages", items: [] },
+        liquour: { title: "cellar liquor", items: [] }
+    };
+
+    const DEFAULT_ITEMS = [
+        { id: "d1", name: "Classic Tropical Breakfast", description: "Fresh tropical fruits, eggs to order, artisan toast, and organic honey.", price: 1200, category: "morning", imageUrl: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80" },
+        { id: "d2", name: "Pan-Seared Tilapia", description: "Fresh local tilapia served with herb butter and garlic roasted potatoes.", price: 2400, category: "main", imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80" }
+    ];
+
+    const $ = (id) => document.getElementById(id);
+    const ksh = (n) => "Ksh " + Number(n).toLocaleString("en-KE");
+    const cart = {};
+    let cat = "morning", idx = 0, items = [];
+
+    const track = $("track"), ring = $("ring"), ringText = $("ringText");
+
+    function key(i = idx) { return cat + ":" + i; }
+    function lookup(k) { const [c, i] = k.split(":"); return MENU[c] && MENU[c].items[+i]; }
+
+    function loadMenuFromStorage() {
+        try {
+            const raw = localStorage.getItem("paleo_menu_items");
+            let storedItems = raw ? JSON.parse(raw) : [];
+
+            if (!storedItems || storedItems.length === 0) {
+                storedItems = DEFAULT_ITEMS;
+                localStorage.setItem("paleo_menu_items", JSON.stringify(storedItems));
+            }
+
+            const structured = {
+                morning: { title: "morning feasts", items: [] },
+                starter: { title: "starters", items: [] },
+                main: { title: "gourmet mains", items: [] },
+                dessert: { title: "sweet desserts", items: [] },
+                "soft drinks": { title: "soft beverages", items: [] },
+                liquour: { title: "cellar liquor", items: [] }
+            };
+
+            storedItems.forEach(item => {
+                let cKey = (item.category || "main").toLowerCase().trim();
+                if (!structured[cKey]) {
+                    structured[cKey] = { title: cKey, items: [] };
+                }
+                structured[cKey].items.push({
+                    id: item.id || 'item_' + Date.now(),
+                    name: item.name,
+                    desc: item.description || '',
+                    price: Number(item.price),
+                    img: item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'
+                });
+            });
+            MENU = structured;
+        } catch(e) {
+            console.warn("Could not read local storage menu items.", e);
+        }
+        build(cat);
+    }
+
+    function show(view) {
+        document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.view === view ? "true" : "false"));
+        if (view !== cat) build(view);
+    }
+
+    function build(category) {
+        cat = category;
+        idx = 0;
+        items = (MENU[cat] && MENU[cat].items) || [];
+
+        if (items.length === 0) {
+            track.innerHTML = `<p class="empty-msg">No items available in this category yet.</p>`;
+            $("dName").textContent = "No Dishes";
+            $("dDesc").textContent = "Check back soon.";
+            $("dPrice").textContent = "";
+            $("ctl").innerHTML = "";
+            $("count").textContent = "";
+            ringText.textContent = "";
+            return;
+        }
+
+        const ringStr = (` • PALEO HOTEL & SPA • ${(MENU[cat]?.title || cat).toUpperCase()} `).repeat(4);
+        ringText.textContent = ringStr;
+
+        track.innerHTML = items.map((item, i) => `
+            <div class="slide" data-i="${i}">
+                <img src="${item.img}" alt="${item.name}">
+            </div>
+        `).join('');
+
+        updateDisplay();
+        scrollToSlide(0);
+    }
+
+    function scrollToSlide(i) {
+        const slide = track.children[i];
+        if (slide) slide.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    }
+
+    function updateDisplay() {
+        if (!items[idx]) return;
+        const item = items[idx];
+
+        $("count").textContent = `${idx + 1} of ${items.length} · ${MENU[cat]?.title || cat}`;
+        $("dName").textContent = item.name;
+        $("dDesc").textContent = item.desc;
+        $("dPrice").textContent = ksh(item.price);
+
+        const currentKey = key();
+        const qty = cart[currentKey] || 0;
+
+        if (qty > 0) {
+            $("ctl").innerHTML = `
+                <div class="step">
+                    <button type="button" onclick="changeQty('${currentKey}', -1)">-</button>
+                    <b>${qty}</b>
+                    <button type="button" onclick="changeQty('${currentKey}', 1)">+</button>
+                </div>`;
+        } else {
+            $("ctl").innerHTML = `<button type="button" class="add" onclick="changeQty('${currentKey}', 1)">Select Item</button>`;
+        }
+
+        $("prev").disabled = idx === 0;
+        $("next").disabled = idx === items.length - 1;
+        ring.style.transform = `rotate(${idx * -45}deg)`;
+
+        const info = $("info");
+        info.classList.remove("in");
+        void info.offsetWidth;
+        info.classList.add("in");
+    }
+
+    window.changeQty = function(k, delta) {
+        const currentQty = cart[k] || 0;
+        const newQty = Math.max(0, currentQty + delta);
+        if (newQty === 0) delete cart[k];
+        else cart[k] = newQty;
+
+        updateDisplay();
+        updateTray();
+    };
+
+    function updateTray() {
+        let totalQty = 0, totalPrice = 0;
+        for (const [k, qty] of Object.entries(cart)) {
+            const item = lookup(k);
+            if (item) { totalQty += qty; totalPrice += item.price * qty; }
+        }
+        const tray = $("tray");
+        if (totalQty > 0) {
+            $("trayL").innerHTML = `${totalQty} Item${totalQty > 1 ? 's' : ''} <small>View selection</small>`;
+            $("trayR").textContent = ksh(totalPrice);
+            tray.classList.add("show");
+        } else {
+            tray.classList.remove("show");
+        }
+    }
+
+    let scrollTimeout;
+    track.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const slideWidth = track.firstElementChild ? track.firstElementChild.offsetWidth : 1;
+            const newIdx = Math.round(track.scrollLeft / slideWidth);
+            if (newIdx !== idx && newIdx >= 0 && newIdx < items.length) {
+                idx = newIdx;
+                updateDisplay();
+            }
+        }, 60);
+    });
+
+    $("prev").addEventListener('click', () => { if (idx > 0) { idx--; scrollToSlide(idx); } });
+    $("next").addEventListener('click', () => { if (idx < items.length - 1) { idx++; scrollToSlide(idx); } });
+
+    document.querySelector(".tabs").addEventListener('click', (e) => {
+        const tab = e.target.closest(".tab");
+        if (tab) show(tab.dataset.view);
+    });
+
+    const sheet = $("sheet");
+    $("tray").addEventListener('click', () => {
+        const lines = $("lines");
+        let total = 0;
+        lines.innerHTML = Object.entries(cart).map(([k, qty]) => {
+            const item = lookup(k);
+            if (!item) return '';
+            const lineTotal = item.price * qty;
+            total += lineTotal;
+            return `
+                <div class="line">
+                    <div>${item.name}<small>${ksh(item.price)} each</small></div>
+                    <div class="step">
+                        <button type="button" onclick="changeQty('${k}', -1); refreshSheet();">-</button>
+                        <b>${qty}</b>
+                        <button type="button" onclick="changeQty('${k}', 1); refreshSheet();">+</button>
+                    </div>
+                </div>`;
+        }).join('');
+        $("sheetTotal").textContent = ksh(total);
+        sheet.showModal();
+    });
+
+    window.refreshSheet = function() {
+        if (Object.keys(cart).length === 0) { sheet.close(); return; }
+        let total = 0;
+        Object.entries(cart).forEach(([k, qty]) => {
+            const item = lookup(k);
+            if (item) total += item.price * qty;
+        });
+        $("sheetTotal").textContent = ksh(total);
+    };
+
+    $("sheetClose").addEventListener('click', () => sheet.close());
+
+    window.addEventListener('focus', loadMenuFromStorage);
+    loadMenuFromStorage();
+</script>
+</body>
+</html>

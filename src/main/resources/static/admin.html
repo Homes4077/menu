@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Paleo Hotel & Spa — Admin Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT,WONK@9..144,300..900,0..100,0..1&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <style>
+        :root {
+            --deep: #091315;
+            --lagoon: #132b2a;
+            --bone: #f5eedc;
+            --gold: #ffb627;
+            --gold-glow: rgba(255, 182, 39, 0.35);
+            --muted: #a1b5ac;
+            --line: rgba(245, 238, 220, 0.12);
+            --danger: #ff5c5c;
+        }
+
+        *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+        html{background:var(--deep);height:100%}
+        body{
+            min-height:100%;min-height:100dvh;color:var(--bone);font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+            background:radial-gradient(80% 50% at 50% 0%, rgba(255,182,39,0.12), transparent 70%),
+            radial-gradient(100% 60% at 0% 100%, rgba(22,48,47,0.4), transparent 70%), var(--deep);
+            display:flex;justify-content:center;overflow-x:hidden;
+            padding-top:env(safe-area-inset-top);
+            padding-bottom:env(safe-area-inset-bottom);
+        }
+
+        .app{
+            width:min(100%,520px);min-height:100dvh;display:flex;flex-direction:column;
+            padding:16px 20px calc(40px + env(safe-area-inset-bottom, 0px));position:relative;z-index:1;
+        }
+        :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:8px}
+        button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+        /* --- SECURITY PIN LOCK OVERLAY --- */
+        .lock-screen {
+            position: fixed; inset: 0; background: var(--deep); z-index: 1000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px;
+        }
+        .lock-screen.hidden { display: none; }
+        .pin-box {
+            background: var(--lagoon); border: 1px solid var(--line); border-radius: 28px;
+            padding: 32px 24px; width: 100%; max-width: 360px; text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+        }
+        .pin-box h2 { font-family: 'Fraunces', serif; font-size: 1.5rem; margin-bottom: 6px; }
+        .pin-box p { color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; }
+        .pin-dots { display: flex; justify-content: center; gap: 14px; margin-bottom: 28px; }
+        .dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--gold); background: transparent; transition: background 0.2s, transform 0.2s; }
+        .dot.filled { background: var(--gold); transform: scale(1.1); box-shadow: 0 0 10px var(--gold-glow); }
+        .num-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .num-btn {
+            background: rgba(255,255,255,0.04); border: 1px solid var(--line); border-radius: 16px;
+            height: 56px; font-size: 1.25rem; font-weight: 700; cursor: pointer; transition: background 0.15s, border-color 0.15s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .num-btn:active { background: rgba(255,182,39,0.2); border-color: var(--gold); }
+        .pin-err { color: var(--danger); font-size: 0.82rem; margin-top: 14px; min-height: 1.2em; font-weight: 600; }
+
+        /* Masthead */
+        .brand{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+        .brand h1{
+            font-family:'Fraunces',serif;font-weight:800;font-size:2rem;line-height:1;letter-spacing:-.03em;
+            background: linear-gradient(135deg, #ffffff 30%, var(--gold));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-variation-settings:'SOFT' 100,'WONK' 1,'opsz' 144
+        }
+        .header-actions{display:flex;align-items:center;gap:8px;}
+        .lock-btn{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-weight:700;border:1px solid var(--line);padding:8px 12px;border-radius:99px;background:rgba(255,255,255,0.03);transition:border-color .2s}
+        .lock-btn:hover{border-color:var(--danger);color:var(--danger)}
+        .back-link{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-weight:700;text-decoration:none;border:1px solid var(--line);padding:8px 12px;border-radius:99px;background:rgba(255,255,255,0.03);transition:border-color .2s}
+        .back-link:hover{border-color:var(--gold);color:var(--gold)}
+        .brand span.sub{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.15em;font-weight:600;display:block}
+
+        .actions-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+        .btn-primary{
+            background:linear-gradient(135deg, #ffc44d, var(--gold));color:#140f02;font-weight:700;
+            padding:12px 18px;border-radius:14px;font-size:.85rem;display:flex;align-items:center;gap:8px;
+            box-shadow:0 4px 15px rgba(255, 182, 39, 0.25);transition:transform .15s;flex:1;justify-content:center;
+        }
+        .btn-secondary{
+            background:rgba(255,182,39,0.1);border:1px solid var(--gold);color:var(--gold);font-weight:700;
+            padding:12px 18px;border-radius:14px;font-size:.85rem;display:flex;align-items:center;gap:8px;
+            transition:background .2s;justify-content:center;
+        }
+        .btn-primary:active,.btn-secondary:active{transform:scale(.97)}
+
+        h2{font-family:'Fraunces',serif;font-weight:700;font-size:1.3rem;margin-bottom:12px;font-variation-settings:'SOFT' 100}
+
+        /* Items List */
+        .item-list{display:flex;flex-direction:column;gap:10px;margin-bottom:30px}
+        .item-card{
+            background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:16px;
+            padding:12px 16px;display:flex;align-items:center;gap:14px;backdrop-filter:blur(10px);
+        }
+        .item-card img{width:50px;height:50px;border-radius:50%;object-fit:cover;background:var(--lagoon);flex-shrink:0}
+        .item-details{flex:1;min-width:0}
+        .item-details h3{font-size:.95rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .item-details p{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+        .item-details .price-tag{font-family:'Fraunces',serif;color:var(--gold);font-weight:700;font-size:.9rem;margin-top:2px}
+        .item-actions{display:flex;gap:6px}
+        .icon-btn{
+            width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.05);border:1px solid var(--line);
+            display:flex;align-items:center;justify-content:center;font-size:.85rem;color:var(--bone);cursor:pointer;transition:all .2s
+        }
+        .icon-btn.del:hover{background:rgba(255,142,130,0.2);border-color:#ff8e82;color:#ff8e82}
+        .icon-btn.edit:hover{background:rgba(255,182,39,0.2);border-color:var(--gold);color:var(--gold)}
+
+        /* Dialogs */
+        dialog{
+            margin:auto;width:calc(100% - 32px);max-width:460px;max-height:90dvh;overflow-y:auto;border:0;
+            border-radius:24px;background:#112224;color:var(--bone);
+            padding:24px;box-shadow:0 20px 50px rgba(0,0,0,0.7);border:1px solid var(--line);
+        }
+        dialog::backdrop{background:rgba(3,10,11,.8);backdrop-filter:blur(8px)}
+        dialog h3{font-family:'Fraunces',serif;font-weight:700;font-size:1.4rem;margin-bottom:16px;font-variation-settings:'SOFT' 100}
+
+        .field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+        .field label{font-size:.78rem;color:var(--muted);font-weight:600}
+        .field input,.field select,.field textarea{
+            width:100%;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;
+            color:var(--bone);padding:12px 14px;font:inherit;font-size:15px;color-scheme:dark;resize:none;
+        }
+        .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,182,39,.2)}
+        .err{color:#ff8e82;font-size:.8rem;margin-bottom:10px;font-weight:500}
+
+        .file-upload-box {
+            border: 2px dashed var(--line); border-radius: 14px; padding: 14px; text-align: center;
+            background: rgba(255,255,255,0.02); cursor: pointer; position: relative; margin-top: 4px;
+        }
+        .file-upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .file-upload-box span { font-size: 0.8rem; color: var(--muted); }
+
+        .modal-btns{display:flex;gap:10px;margin-top:16px}
+        .btn-save{flex:1;background:linear-gradient(135deg, #ffc44d, var(--gold));color:#140f02;font-weight:700;padding:13px;border-radius:14px;cursor:pointer}
+        .btn-cancel{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--line);padding:13px 20px;border-radius:14px;font-weight:600;cursor:pointer}
+
+        .qr-container{display:flex;justify-content:center;margin:15px 0;background:#fff;padding:20px;border-radius:16px}
+    </style>
+</head>
+<body>
+
+<!-- PIN LOCK OVERLAY SCREEN -->
+<div class="lock-screen" id="lockScreen">
+    <div class="pin-box">
+        <h2>Admin Console</h2>
+        <p>Enter 4-digit security passcode</p>
+        <div class="pin-dots">
+            <div class="dot" id="dot0"></div>
+            <div class="dot" id="dot1"></div>
+            <div class="dot" id="dot2"></div>
+            <div class="dot" id="dot3"></div>
+        </div>
+        <div class="num-pad">
+            <button class="num-btn" onclick="pressNum('1')">1</button>
+            <button class="num-btn" onclick="pressNum('2')">2</button>
+            <button class="num-btn" onclick="pressNum('3')">3</button>
+            <button class="num-btn" onclick="pressNum('4')">4</button>
+            <button class="num-btn" onclick="pressNum('5')">5</button>
+            <button class="num-btn" onclick="pressNum('6')">6</button>
+            <button class="num-btn" onclick="pressNum('7')">7</button>
+            <button class="num-btn" onclick="pressNum('8')">8</button>
+            <button class="num-btn" onclick="pressNum('9')">9</button>
+            <button class="num-btn" onclick="clearPin()">C</button>
+            <button class="num-btn" onclick="pressNum('0')">0</button>
+            <button class="num-btn" onclick="backPin()">⌫</button>
+        </div>
+        <div class="pin-err" id="pinErr"></div>
+    </div>
+</div>
+
+<div class="app">
+    <header class="brand">
+        <div>
+            <h1>Paleo</h1>
+            <span class="sub">Admin Console</span>
+        </div>
+        <div class="header-actions">
+            <button type="button" class="lock-btn" onclick="lockConsole()">Lock</button>
+            <a href="index.html" class="back-link">View Menu</a>
+        </div>
+    </header>
+
+    <div class="actions-bar">
+        <button type="button" class="btn-primary" id="addBtn">+ Add New Dish</button>
+        <button type="button" class="btn-secondary" id="qrBtn">Menu QR Code</button>
+    </div>
+
+    <h2>Managed Menu Items</h2>
+    <div class="item-list" id="itemList"></div>
+</div>
+
+<!-- Add/Edit Dish Modal -->
+<dialog id="itemModal">
+    <h3 id="modalTitle">Add New Dish</h3>
+    <input type="hidden" id="editIndex">
+    <div class="field">
+        <label for="fName">Dish Name</label>
+        <input id="fName" type="text" placeholder="e.g. Garlic Butter Prawns">
+    </div>
+    <div class="field">
+        <label for="fCategory">Category</label>
+        <select id="fCategory">
+            <option value="morning">Morning Feasts</option>
+            <option value="starter">Starters</option>
+            <option value="main">Gourmet Mains</option>
+            <option value="dessert">Sweet Desserts</option>
+            <option value="soft drinks">Soft Beverages</option>
+            <option value="liquour">Cellar Liquor</option>
+        </select>
+    </div>
+    <div class="field">
+        <label for="fPrice">Price (Ksh)</label>
+        <input id="fPrice" type="number" placeholder="1500">
+    </div>
+    <div class="field">
+        <label for="fDesc">Description</label>
+        <textarea id="fDesc" rows="2" placeholder="Brief appetizing description..."></textarea>
+    </div>
+    <div class="field">
+        <label>Upload Image from Local Device</label>
+        <div class="file-upload-box">
+            <span id="fileLabel">Tap to select photo from local files</span>
+            <input type="file" id="fFile" accept="image/*" onchange="handleFileSelect(event)">
+        </div>
+    </div>
+    <div class="field">
+        <label for="fImg">Or Image URL</label>
+        <input id="fImg" type="url" placeholder="https://images.unsplash.com/...">
+    </div>
+    <div class="err" id="formErr"></div>
+    <div class="modal-btns">
+        <button type="button" class="btn-cancel" id="modalClose">Cancel</button>
+        <button type="button" class="btn-save" id="modalSave">Save Dish</button>
+    </div>
+</dialog>
+
+<!-- QR Code Modal -->
+<dialog id="qrModal">
+    <h3>Menu QR Code</h3>
+    <p style="color:var(--muted);font-size:0.84rem;margin-bottom:8px;">Scan to open the customer-facing menu instantly.</p>
+    <div class="qr-container" id="qrcode"></div>
+    <div class="field" style="margin-bottom:16px;">
+        <label>Target Menu URL</label>
+        <input id="menuUrl" type="text" readonly>
+    </div>
+    <button type="button" id="printQr" class="btn-primary" style="width:100%;margin-bottom:8px;">Print QR Code</button>
+    <button type="button" id="qrClose" style="width:100%;background:none;border:0;color:var(--muted);padding:8px;cursor:pointer;font-weight:600;">Close</button>
+</dialog>
+
+<script>
+    // --- PASSCODE / PIN LOCK SECURITY LOGIC ---
+    const CORRECT_PIN = "1984"; // Change your 4-digit passcode here
+    let enteredPin = "";
+
+    function pressNum(n) {
+        if (enteredPin.length < 4) {
+            enteredPin += n;
+            updateDots();
+            if (enteredPin.length === 4) {
+                if (enteredPin === CORRECT_PIN) {
+                    document.getElementById("lockScreen").classList.add("hidden");
+                    document.getElementById("pinErr").textContent = "";
+                    enteredPin = "";
+                    updateDots();
+                } else {
+                    document.getElementById("pinErr").textContent = "Incorrect passcode. Try again.";
+                    setTimeout(() => clearPin(), 500);
+                }
+            }
+        }
+    }
+
+    function backPin() {
+        enteredPin = enteredPin.slice(0, -1);
+        document.getElementById("pinErr").textContent = "";
+        updateDots();
+    }
+
+    function clearPin() {
+        enteredPin = "";
+        document.getElementById("pinErr").textContent = "";
+        updateDots();
+    }
+
+    function updateDots() {
+        for (let i = 0; i < 4; i++) {
+            const dot = document.getElementById(`dot${i}`);
+            if (dot) dot.classList.toggle("filled", i < enteredPin.length);
+        }
+    }
+
+    function lockConsole() {
+        clearPin();
+        document.getElementById("lockScreen").classList.remove("hidden");
+    }
+
+    // --- MENU ITEMS MANAGEMENT ---
+    const DEFAULT_ITEMS = [
+        { id: "d1", name: "Classic Tropical Breakfast", description: "Fresh tropical fruits, eggs to order, artisan toast, and organic honey.", price: 1200, category: "morning", imageUrl: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80" },
+        { id: "d2", name: "Pan-Seared Tilapia", description: "Fresh local tilapia served with herb butter and garlic roasted potatoes.", price: 2400, category: "main", imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80" }
+    ];
+
+    const ksh = (n) => "Ksh " + Number(n).toLocaleString("en-KE");
+    let items = [];
+
+    function loadItems() {
+        try {
+            const raw = localStorage.getItem("paleo_menu_items");
+            items = raw ? JSON.parse(raw) : [];
+            if (!items || items.length === 0) {
+                items = DEFAULT_ITEMS;
+                localStorage.setItem("paleo_menu_items", JSON.stringify(items));
+            }
+        } catch(e) {
+            items = DEFAULT_ITEMS;
+        }
+        renderList();
+    }
+
+    function saveItems() {
+        localStorage.setItem("paleo_menu_items", JSON.stringify(items));
+        renderList();
+    }
+
+    function renderList() {
+        const list = document.getElementById('itemList');
+        if (items.length === 0) {
+            list.innerHTML = `<p style="color:var(--muted);text-align:center;padding:30px;">No dishes configured yet.</p>`;
+            return;
+        }
+
+        list.innerHTML = items.map((item, index) => `
+            <div class="item-card">
+                <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}" alt="${item.name}">
+                <div class="item-details">
+                    <h3>${item.name}</h3>
+                    <p>${(item.category || 'main').toUpperCase()} · ${item.description || 'No description'}</p>
+                    <div class="price-tag">${ksh(item.price)}</div>
+                </div>
+                <div class="item-actions">
+                    <button type="button" class="icon-btn edit" onclick="editItem(${index})" title="Edit">&#9998;</button>
+                    <button type="button" class="icon-btn del" onclick="deleteItem(${index})" title="Delete">&#10005;</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Image Upload Conversion
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        document.getElementById('fileLabel').textContent = file.name;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                const MAX_SIZE = 600;
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                } else {
+                    if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const base64Data = canvas.toDataURL('image/jpeg', 0.85);
+                document.getElementById('fImg').value = base64Data;
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    const itemModal = document.getElementById('itemModal');
+
+    document.getElementById('addBtn').addEventListener('click', () => {
+        document.getElementById('modalTitle').textContent = "Add New Dish";
+        document.getElementById('editIndex').value = "";
+        document.getElementById('fName').value = "";
+        document.getElementById('fCategory').value = "main";
+        document.getElementById('fPrice').value = "";
+        document.getElementById('fDesc').value = "";
+        document.getElementById('fImg').value = "";
+        document.getElementById('fileLabel').textContent = "Tap to select photo from local files";
+        document.getElementById('formErr').textContent = "";
+        itemModal.showModal();
+    });
+
+    window.editItem = function(index) {
+        const item = items[index];
+        document.getElementById('modalTitle').textContent = "Edit Dish";
+        document.getElementById('editIndex').value = index;
+        document.getElementById('fName').value = item.name;
+        document.getElementById('fCategory').value = item.category || 'main';
+        document.getElementById('fPrice').value = item.price;
+        document.getElementById('fDesc').value = item.description || '';
+        document.getElementById('fImg').value = item.imageUrl || '';
+        document.getElementById('fileLabel').textContent = "Change local file...";
+        document.getElementById('formErr').textContent = "";
+        itemModal.showModal();
+    };
+
+    window.deleteItem = function(index) {
+        if (confirm("Are you sure you want to delete this dish?")) {
+            items.splice(index, 1);
+            saveItems();
+        }
+    };
+
+    document.getElementById('modalClose').addEventListener('click', () => itemModal.close());
+
+    document.getElementById('modalSave').addEventListener('click', () => {
+        const name = document.getElementById('fName').value.trim();
+        const category = document.getElementById('fCategory').value;
+        const price = Number(document.getElementById('fPrice').value);
+        const description = document.getElementById('fDesc').value.trim();
+        const imageUrl = document.getElementById('fImg').value.trim() || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80';
+        const editIndex = document.getElementById('editIndex').value;
+        const err = document.getElementById('formErr');
+
+        if (!name || !price) {
+            err.textContent = "Please fill in both the dish name and price.";
+            return;
+        }
+
+        const payload = {
+            id: editIndex !== "" && items[editIndex] ? items[editIndex].id : 'item_' + Date.now(),
+            name, category, price, description, imageUrl
+        };
+
+        if (editIndex !== "") {
+            items[editIndex] = payload;
+        } else {
+            items.push(payload);
+        }
+
+        saveItems();
+        itemModal.close();
+    });
+
+    // QR Code Handler
+    const qrModal = document.getElementById('qrModal');
+    const menuUrlInput = document.getElementById('menuUrl');
+    const currentMenuLink = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
+
+    document.getElementById('qrBtn').addEventListener('click', () => {
+        menuUrlInput.value = currentMenuLink;
+        const container = document.getElementById('qrcode');
+        container.innerHTML = "";
+
+        const canvas = document.createElement('canvas');
+        container.appendChild(canvas);
+
+        new QRious({
+            element: canvas,
+            value: currentMenuLink,
+            size: 200,
+            level: 'H',
+            background: '#ffffff',
+            foreground: '#091315'
+        });
+
+        qrModal.showModal();
+    });
+
+    document.getElementById('qrClose').addEventListener('click', () => qrModal.close());
+
+    document.getElementById('printQr').addEventListener('click', () => {
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Paleo Hotel & Spa — Menu QR Code</title>
+                <style>
+                    body { font-family: sans-serif; text-align: center; padding-top: 40px; color: #111; }
+                    h1 { font-family: serif; font-size: 28px; margin-bottom: 5px; }
+                    p { font-size: 14px; color: #555; margin-bottom: 25px; }
+                    .qr-box { display: inline-block; padding: 20px; border: 2px dashed #ccc; border-radius: 20px; }
+                </style>
+            </head>
+            <body>
+                <h1>Paleo Hotel & Spa</h1>
+                <p>Scan to view our digital menu & place orders</p>
+                <div class="qr-box">
+                    ${document.getElementById('qrcode').innerHTML}
+                </div>
+                <p style="margin-top:20px;font-size:12px;color:#888;">${currentMenuLink}</p>
+                <script>
+                    window.onload = function() { window.print(); window.close(); }
+                <\/script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+    });
+
+    loadItems();
+</script>
+</body>
+</html>
