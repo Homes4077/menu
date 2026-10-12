@@ -133,7 +133,22 @@
         .tray.show{transform:translate(-50%,0)}
         .tray small{font-weight:600;opacity:.7;display:block;font-size:.74rem;margin-top:1px}
 
-        /* Dialog */
+        /* Dialog & Dropdown Visibility Fix */
+        select, .field select {
+            background-color: #112224 !important;
+            color: var(--bone) !important;
+            border: 1px solid var(--line);
+        }
+        select option {
+            background-color: #112224 !important;
+            color: var(--bone) !important;
+            padding: 12px;
+        }
+        select option:hover, select option:focus, select option:checked {
+            background-color: var(--gold) !important;
+            color: #140f02 !important;
+        }
+
         dialog{
             margin:auto auto 0;width:100%;max-width:480px;max-height:85dvh;overflow-y:auto;border:0;
             border-radius:28px 28px 0 0;background:#112224;color:var(--bone);
@@ -215,56 +230,61 @@
         liquour: { title: "cellar liquor", items: [] }
     };
 
-    const DEFAULT_ITEMS = [
-        { id: "d1", name: "Classic Tropical Breakfast", description: "Fresh tropical fruits, eggs to order, artisan toast, and organic honey.", price: 1200, category: "morning", imageUrl: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?auto=format&fit=crop&w=600&q=80" },
-        { id: "d2", name: "Pan-Seared Tilapia", description: "Fresh local tilapia served with herb butter and garlic roasted potatoes.", price: 2400, category: "main", imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80" }
-    ];
-
-    const \$ = (id) => document.getElementById(id);
+    const $ = (id) => document.getElementById(id);
     const ksh = (n) => "Ksh " + Number(n).toLocaleString("en-KE");
     const cart = {};
     let cat = "morning", idx = 0, items = [];
 
-    const track = \$("track"), ring = $("ring"), ringText = $("ringText");
+    const track = $("track"), ring = $("ring"), ringText = $("ringText");
 
     function key(i = idx) { return cat + ":" + i; }
     function lookup(k) { const [c, i] = k.split(":"); return MENU[c] && MENU[c].items[+i]; }
 
-    function loadMenuFromStorage() {
+    async function loadMenuFromBackend() {
         try {
-            const raw = localStorage.getItem("paleo_menu_items");
-            let storedItems = raw ? JSON.parse(raw) : [];
+            const response = await fetch('/api/public/menu/paleo-hotel-spa');
+            if (response.ok) {
+                const data = await response.json();
+                const structured = {
+                    morning: { title: "morning feasts", items: [] },
+                    starter: { title: "starters", items: [] },
+                    main: { title: "gourmet mains", items: [] },
+                    dessert: { title: "sweet desserts", items: [] },
+                    "soft drinks": { title: "soft beverages", items: [] },
+                    liquour: { title: "cellar liquor", items: [] }
+                };
 
-            if (!storedItems || storedItems.length === 0) {
-                storedItems = DEFAULT_ITEMS;
-                localStorage.setItem("paleo_menu_items", JSON.stringify(storedItems));
-            }
+                if (data.categories) {
+                    data.categories.forEach(category => {
+                        let cKey = category.name.toLowerCase().trim();
+                        if (cKey.includes('morning')) cKey = 'morning';
+                        else if (cKey.includes('starter')) cKey = 'starter';
+                        else if (cKey.includes('main')) cKey = 'main';
+                        else if (cKey.includes('dessert')) cKey = 'dessert';
+                        else if (cKey.includes('drink')) cKey = 'soft drinks';
+                        else if (cKey.includes('liquor')) cKey = 'liquour';
 
-            const structured = {
-                morning: { title: "morning feasts", items: [] },
-                starter: { title: "starters", items: [] },
-                main: { title: "gourmet mains", items: [] },
-                dessert: { title: "sweet desserts", items: [] },
-                "soft drinks": { title: "soft beverages", items: [] },
-                liquour: { title: "cellar liquor", items: [] }
-            };
+                        if (!structured[cKey]) {
+                            structured[cKey] = { title: category.name, items: [] };
+                        }
 
-            storedItems.forEach(item => {
-                let cKey = (item.category || "main").toLowerCase().trim();
-                if (!structured[cKey]) {
-                    structured[cKey] = { title: cKey, items: [] };
+                        if (category.items) {
+                            category.items.forEach(item => {
+                                structured[cKey].items.push({
+                                    id: item.id,
+                                    name: item.name,
+                                    desc: item.description || '',
+                                    price: Number(item.price),
+                                    img: item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'
+                                });
+                            });
+                        }
+                    });
                 }
-                structured[cKey].items.push({
-                    id: item.id || 'item_' + Date.now(),
-                    name: item.name,
-                    desc: item.description || '',
-                    price: Number(item.price),
-                    img: item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'
-                });
-            });
-            MENU = structured;
+                MENU = structured;
+            }
         } catch(e) {
-            console.warn("Could not read local storage menu items.", e);
+            console.warn("Could not fetch public menu from backend.", e);
         }
         build(cat);
     }
@@ -423,8 +443,8 @@
 
     \$("sheetClose").addEventListener('click', () => sheet.close());
 
-    window.addEventListener('focus', loadMenuFromStorage);
-    loadMenuFromStorage();
+    window.addEventListener('focus', loadMenuFromBackend);
+    loadMenuFromBackend();
 </script>
 </body>
 </html>
