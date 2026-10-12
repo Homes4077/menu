@@ -45,7 +45,7 @@
         button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
         /* Masthead */
-        .brand{padding:0 20px;display:flex;align-items:center;justify-space-between:space-between}
+        .brand{padding:0 20px;display:flex;align-items:center;justify-content:space-between}
         .brand h1{
             font-family:'Fraunces',serif;font-weight:800;font-size:2.5rem;line-height:1;letter-spacing:-.03em;
             background: linear-gradient(135deg, #ffffff 30%, var(--gold));
@@ -77,16 +77,21 @@
         .stage{position:relative;height:calc(var(--p)*1.35);margin-top:5px}
         .ring{position:absolute;left:50%;top:50%;width:calc(var(--p)*1.36);height:calc(var(--p)*1.36);margin:calc(var(--p)*-.68) 0 0 calc(var(--p)*-.68);pointer-events:none;will-change:transform;transition:transform 0.4s cubic-bezier(.2,1,.3,1)}
         .ring text{font-family:'Fraunces',serif;font-size:18px;font-style:italic;fill:var(--gold);opacity:.85;letter-spacing:2px}
+        
         .track{
-            position:absolute;inset:0;display:flex;align-items:center;gap:0;
+            position:absolute;inset:0;display:flex;align-items:center;
+            gap: 40px;
             overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
-            padding-inline:calc(50% - var(--p)/2);-webkit-overflow-scrolling:touch;
+            padding-inline: calc(50% - var(--p) / 2);
+            -webkit-overflow-scrolling:touch;
         }
         .track::-webkit-scrollbar{display:none}
+        
         .slide{
-            flex:none;width:var(--p);height:var(--p);border-radius:50%;scroll-snap-align:center;padding:0;
+            flex:0 0 var(--p);width:var(--p);height:var(--p);border-radius:50%;
+            scroll-snap-align:center;scroll-snap-stop:always;padding:0;
             box-shadow:0 0 0 1px rgba(255,182,39,0.3), 0 0 25px -5px rgba(0,0,0,0.8), 0 20px 40px -15px rgba(0,0,0,0.9);
-            position:relative; transition: transform .3s ease;
+            position:relative;transition: transform .3s ease;
         }
         .slide img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;background:var(--lagoon)}
 
@@ -215,12 +220,12 @@
         { id: "d2", name: "Pan-Seared Tilapia", description: "Fresh local tilapia served with herb butter and garlic roasted potatoes.", price: 2400, category: "main", imageUrl: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80" }
     ];
 
-    const $ = (id) => document.getElementById(id);
+    const \$ = (id) => document.getElementById(id);
     const ksh = (n) => "Ksh " + Number(n).toLocaleString("en-KE");
     const cart = {};
     let cat = "morning", idx = 0, items = [];
 
-    const track = $("track"), ring = $("ring"), ringText = $("ringText");
+    const track = \$("track"), ring = $("ring"), ringText = $("ringText");
 
     function key(i = idx) { return cat + ":" + i; }
     function lookup(k) { const [c, i] = k.split(":"); return MENU[c] && MENU[c].items[+i]; }
@@ -276,11 +281,11 @@
 
         if (items.length === 0) {
             track.innerHTML = `<p class="empty-msg">No items available in this category yet.</p>`;
-            $("dName").textContent = "No Dishes";
-            $("dDesc").textContent = "Check back soon.";
-            $("dPrice").textContent = "";
-            $("ctl").innerHTML = "";
-            $("count").textContent = "";
+            \$("dName").textContent = "No Dishes";
+            \$("dDesc").textContent = "Check back soon.";
+            \$("dPrice").textContent = "";
+            \$("ctl").innerHTML = "";
+            \$("count").textContent = "";
             ringText.textContent = "";
             return;
         }
@@ -307,30 +312,30 @@
         if (!items[idx]) return;
         const item = items[idx];
 
-        $("count").textContent = `${idx + 1} of ${items.length} · ${MENU[cat]?.title || cat}`;
-        $("dName").textContent = item.name;
-        $("dDesc").textContent = item.desc;
-        $("dPrice").textContent = ksh(item.price);
+        \$("count").textContent = `${idx + 1} of ${items.length} · ${MENU[cat]?.title || cat}`;
+        \$("dName").textContent = item.name;
+        \$("dDesc").textContent = item.desc;
+        \$("dPrice").textContent = ksh(item.price);
 
         const currentKey = key();
         const qty = cart[currentKey] || 0;
 
         if (qty > 0) {
-            $("ctl").innerHTML = `
+            \$("ctl").innerHTML = `
                 <div class="step">
                     <button type="button" onclick="changeQty('${currentKey}', -1)">-</button>
                     <b>${qty}</b>
                     <button type="button" onclick="changeQty('${currentKey}', 1)">+</button>
                 </div>`;
         } else {
-            $("ctl").innerHTML = `<button type="button" class="add" onclick="changeQty('${currentKey}', 1)">Select Item</button>`;
+            \$("ctl").innerHTML = `<button type="button" class="add" onclick="changeQty('${currentKey}', 1)">Select Item</button>`;
         }
 
-        $("prev").disabled = idx === 0;
-        $("next").disabled = idx === items.length - 1;
+        \$("prev").disabled = idx === 0;
+        \$("next").disabled = idx === items.length - 1;
         ring.style.transform = `rotate(${idx * -45}deg)`;
 
-        const info = $("info");
+        const info = \$("info");
         info.classList.remove("in");
         void info.offsetWidth;
         info.classList.add("in");
@@ -352,10 +357,10 @@
             const item = lookup(k);
             if (item) { totalQty += qty; totalPrice += item.price * qty; }
         }
-        const tray = $("tray");
+        const tray = \$("tray");
         if (totalQty > 0) {
-            $("trayL").innerHTML = `${totalQty} Item${totalQty > 1 ? 's' : ''} <small>View selection</small>`;
-            $("trayR").textContent = ksh(totalPrice);
+            \$("trayL").innerHTML = `${totalQty} Item${totalQty > 1 ? 's' : ''} <small>View selection</small>`;
+            \$("trayR").textContent = ksh(totalPrice);
             tray.classList.add("show");
         } else {
             tray.classList.remove("show");
@@ -375,17 +380,17 @@
         }, 60);
     });
 
-    $("prev").addEventListener('click', () => { if (idx > 0) { idx--; scrollToSlide(idx); } });
-    $("next").addEventListener('click', () => { if (idx < items.length - 1) { idx++; scrollToSlide(idx); } });
+    \$("prev").addEventListener('click', () => { if (idx > 0) { idx--; scrollToSlide(idx); } });
+    \$("next").addEventListener('click', () => { if (idx < items.length - 1) { idx++; scrollToSlide(idx); } });
 
     document.querySelector(".tabs").addEventListener('click', (e) => {
         const tab = e.target.closest(".tab");
         if (tab) show(tab.dataset.view);
     });
 
-    const sheet = $("sheet");
-    $("tray").addEventListener('click', () => {
-        const lines = $("lines");
+    const sheet = \$("sheet");
+    \$("tray").addEventListener('click', () => {
+        const lines = \$("lines");
         let total = 0;
         lines.innerHTML = Object.entries(cart).map(([k, qty]) => {
             const item = lookup(k);
@@ -402,7 +407,7 @@
                     </div>
                 </div>`;
         }).join('');
-        $("sheetTotal").textContent = ksh(total);
+        \$("sheetTotal").textContent = ksh(total);
         sheet.showModal();
     });
 
@@ -413,10 +418,10 @@
             const item = lookup(k);
             if (item) total += item.price * qty;
         });
-        $("sheetTotal").textContent = ksh(total);
+        \$("sheetTotal").textContent = ksh(total);
     };
 
-    $("sheetClose").addEventListener('click', () => sheet.close());
+    \$("sheetClose").addEventListener('click', () => sheet.close());
 
     window.addEventListener('focus', loadMenuFromStorage);
     loadMenuFromStorage();
