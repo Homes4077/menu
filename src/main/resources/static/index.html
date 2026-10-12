@@ -290,8 +290,10 @@
     }
 
     function show(view) {
-        document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.dataset.view === view ? "true" : "false"));
-        if (view !== cat) build(view);
+        document.querySelectorAll(".tab").forEach(t => {
+            t.setAttribute("aria-selected", t.dataset.view === view ? "true" : "false");
+        });
+        build(view);
     }
 
     function build(category) {
@@ -301,11 +303,11 @@
 
         if (items.length === 0) {
             track.innerHTML = `<p class="empty-msg">No items available in this category yet.</p>`;
-            \$("dName").textContent = "No Dishes";
-            \$("dDesc").textContent = "Check back soon.";
-            \$("dPrice").textContent = "";
-            \$("ctl").innerHTML = "";
-            \$("count").textContent = "";
+            $("dName").textContent = "No Dishes";
+            $("dDesc").textContent = "Check back soon.";
+            $("dPrice").textContent = "";
+            $("ctl").innerHTML = "";
+            $("count").textContent = "";
             ringText.textContent = "";
             return;
         }
@@ -332,30 +334,30 @@
         if (!items[idx]) return;
         const item = items[idx];
 
-        \$("count").textContent = `${idx + 1} of ${items.length} · ${MENU[cat]?.title || cat}`;
-        \$("dName").textContent = item.name;
-        \$("dDesc").textContent = item.desc;
-        \$("dPrice").textContent = ksh(item.price);
+        $("count").textContent = `${idx + 1} of ${items.length} · ${MENU[cat]?.title || cat}`;
+        $("dName").textContent = item.name;
+        $("dDesc").textContent = item.desc;
+        $("dPrice").textContent = ksh(item.price);
 
         const currentKey = key();
         const qty = cart[currentKey] || 0;
 
         if (qty > 0) {
-            \$("ctl").innerHTML = `
+            $("ctl").innerHTML = `
                 <div class="step">
                     <button type="button" onclick="changeQty('${currentKey}', -1)">-</button>
                     <b>${qty}</b>
                     <button type="button" onclick="changeQty('${currentKey}', 1)">+</button>
                 </div>`;
         } else {
-            \$("ctl").innerHTML = `<button type="button" class="add" onclick="changeQty('${currentKey}', 1)">Select Item</button>`;
+            $("ctl").innerHTML = `<button type="button" class="add" onclick="changeQty('${currentKey}', 1)">Select Item</button>`;
         }
 
-        \$("prev").disabled = idx === 0;
-        \$("next").disabled = idx === items.length - 1;
+        $("prev").disabled = idx === 0;
+        $("next").disabled = idx === items.length - 1;
         ring.style.transform = `rotate(${idx * -45}deg)`;
 
-        const info = \$("info");
+        const info = $("info");
         info.classList.remove("in");
         void info.offsetWidth;
         info.classList.add("in");
@@ -377,10 +379,10 @@
             const item = lookup(k);
             if (item) { totalQty += qty; totalPrice += item.price * qty; }
         }
-        const tray = \$("tray");
+        const tray = $("tray");
         if (totalQty > 0) {
-            \$("trayL").innerHTML = `${totalQty} Item${totalQty > 1 ? 's' : ''} <small>View selection</small>`;
-            \$("trayR").textContent = ksh(totalPrice);
+            $("trayL").innerHTML = `${totalQty} Item${totalQty > 1 ? 's' : ''} <small>View selection</small>`;
+            $("trayR").textContent = ksh(totalPrice);
             tray.classList.add("show");
         } else {
             tray.classList.remove("show");
@@ -400,17 +402,19 @@
         }, 60);
     });
 
-    \$("prev").addEventListener('click', () => { if (idx > 0) { idx--; scrollToSlide(idx); } });
-    \$("next").addEventListener('click', () => { if (idx < items.length - 1) { idx++; scrollToSlide(idx); } });
+    $("prev").addEventListener('click', () => { if (idx > 0) { idx--; scrollToSlide(idx); } });
+    $("next").addEventListener('click', () => { if (idx < items.length - 1) { idx++; scrollToSlide(idx); } });
 
     document.querySelector(".tabs").addEventListener('click', (e) => {
         const tab = e.target.closest(".tab");
-        if (tab) show(tab.dataset.view);
+        if (tab) {
+            show(tab.dataset.view);
+        }
     });
 
-    const sheet = \$("sheet");
-    \$("tray").addEventListener('click', () => {
-        const lines = \$("lines");
+    const sheet = $("sheet");
+    $("tray").addEventListener('click', () => {
+        const lines = $("lines");
         let total = 0;
         lines.innerHTML = Object.entries(cart).map(([k, qty]) => {
             const item = lookup(k);
@@ -427,7 +431,7 @@
                     </div>
                 </div>`;
         }).join('');
-        \$("sheetTotal").textContent = ksh(total);
+        $("sheetTotal").textContent = ksh(total);
         sheet.showModal();
     });
 
@@ -438,10 +442,10 @@
             const item = lookup(k);
             if (item) total += item.price * qty;
         });
-        \$("sheetTotal").textContent = ksh(total);
+        $("sheetTotal").textContent = ksh(total);
     };
 
-    \$("sheetClose").addEventListener('click', () => sheet.close());
+    $("sheetClose").addEventListener('click', () => sheet.close());
 
     window.addEventListener('focus', loadMenuFromBackend);
     loadMenuFromBackend();
