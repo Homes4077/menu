@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/public/menu")
 @CrossOrigin(origins = "*")
-@Transactional(readOnly = true) // <-- Keeps the Hibernate session open for all endpoints in this controller
+@Transactional(readOnly = true)
 public class PublicMenuController {
 
     private final BusinessRepository businessRepository;
@@ -34,50 +34,56 @@ public class PublicMenuController {
 
     @GetMapping("/{slug}")
     public ResponseEntity<PublicMenuDTO> getPublicMenu(@PathVariable String slug) {
-        Business business = businessRepository.findBySlugAndActiveTrue(slug)
-                .orElseThrow(() -> new RuntimeException("Business not found or inactive: " + slug));
+        try {
+            // Using findBySlug to avoid any boolean-matching query derivation issues
+            Business business = businessRepository.findBySlug(slug)
+                    .orElseThrow(() -> new RuntimeException("Business not found with slug: " + slug));
 
-        PublicMenuDTO menuDTO = new PublicMenuDTO();
+            PublicMenuDTO menuDTO = new PublicMenuDTO();
 
-        PublicMenuDTO.BusinessDTO bDto = new PublicMenuDTO.BusinessDTO();
-        bDto.setName(business.getName());
-        bDto.setSlug(business.getSlug());
-        bDto.setDescription(business.getDescription());
-        bDto.setLogoUrl(business.getLogoUrl());
-        bDto.setCoverImageUrl(business.getCoverImageUrl());
-        bDto.setPhone(business.getPhone());
-        bDto.setWhatsappNumber(business.getWhatsappNumber());
-        bDto.setLocation(business.getLocation());
-        bDto.setOpeningHours(business.getOpeningHours());
-        bDto.setTheme(business.getTheme());
-        menuDTO.setBusiness(bDto);
+            PublicMenuDTO.BusinessDTO bDto = new PublicMenuDTO.BusinessDTO();
+            bDto.setName(business.getName());
+            bDto.setSlug(business.getSlug());
+            bDto.setDescription(business.getDescription());
+            bDto.setLogoUrl(business.getLogoUrl());
+            bDto.setCoverImageUrl(business.getCoverImageUrl());
+            bDto.setPhone(business.getPhone());
+            bDto.setWhatsappNumber(business.getWhatsappNumber());
+            bDto.setLocation(business.getLocation());
+            bDto.setOpeningHours(business.getOpeningHours());
+            bDto.setTheme(business.getTheme());
+            menuDTO.setBusiness(bDto);
 
-        List<Category> categories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
+            List<Category> categories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
 
-        List<PublicMenuDTO.CategoryDTO> categoryDTOs = categories.stream().map(cat -> {
-            PublicMenuDTO.CategoryDTO cDto = new PublicMenuDTO.CategoryDTO();
-            cDto.setId(cat.getId());
-            cDto.setName(cat.getName());
-            cDto.setDescription(cat.getDescription());
+            List<PublicMenuDTO.CategoryDTO> categoryDTOs = categories.stream().map(cat -> {
+                PublicMenuDTO.CategoryDTO cDto = new PublicMenuDTO.CategoryDTO();
+                cDto.setId(cat.getId());
+                cDto.setName(cat.getName());
+                cDto.setDescription(cat.getDescription());
 
-            List<MenuItem> items = menuItemRepository.findByCategoryIdAndAvailableTrueOrderByDisplayOrderAsc(cat.getId());
-            List<PublicMenuDTO.ItemDTO> itemDTOs = items.stream().map(item -> {
-                PublicMenuDTO.ItemDTO iDto = new PublicMenuDTO.ItemDTO();
-                iDto.setId(item.getId());
-                iDto.setName(item.getName());
-                iDto.setDescription(item.getDescription());
-                iDto.setPrice(item.getPrice());
-                iDto.setImageUrl(item.getImageUrl());
-                iDto.setFeatured(item.isFeatured());
-                return iDto;
+                List<MenuItem> items = menuItemRepository.findByCategoryIdAndAvailableTrueOrderByDisplayOrderAsc(cat.getId());
+                List<PublicMenuDTO.ItemDTO> itemDTOs = items.stream().map(item -> {
+                    PublicMenuDTO.ItemDTO iDto = new PublicMenuDTO.ItemDTO();
+                    iDto.setId(item.getId());
+                    iDto.setName(item.getName());
+                    iDto.setDescription(item.getDescription());
+                    iDto.setPrice(item.getPrice());
+                    iDto.setImageUrl(item.getImageUrl());
+                    iDto.setFeatured(item.isFeatured());
+                    return iDto;
+                }).collect(Collectors.toList());
+
+                cDto.setItems(itemDTOs);
+                return cDto;
             }).collect(Collectors.toList());
 
-            cDto.setItems(itemDTOs);
-            return cDto;
-        }).collect(Collectors.toList());
+            menuDTO.setCategories(categoryDTOs);
 
-        menuDTO.setCategories(categoryDTOs);
-
-        return ResponseEntity.ok(menuDTO);
+            return ResponseEntity.ok(menuDTO);
+        } catch (Exception e) {
+            e.printStackTrace(); // Prints exact error stack trace to Render Live Logs
+            throw e;
+        }
     }
 }
