@@ -68,7 +68,7 @@ public class PublicMenuController {
                     iDto.setName(item.getName());
                     iDto.setDescription(item.getDescription());
                     iDto.setPrice(item.getPrice());
-                    iDto.setImageUrl(item.ImageUrl());
+                    iDto.setImageUrl(item.getImageUrl()); // <-- Fixed getter name here
                     iDto.setFeatured(item.isFeatured());
                     return iDto;
                 }).collect(Collectors.toList());
