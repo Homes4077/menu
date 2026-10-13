@@ -1,6 +1,7 @@
 package com.digitalmenu.digital_menu.model;
 
 import com.digitalmenu.digital_menu.entity.Category;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class MenuItem {
 
     @Id
@@ -26,15 +28,16 @@ public class MenuItem {
 
     private BigDecimal price;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Category category;
 
     private Boolean available = true;
 
     private Integer displayOrder = 0;
 
-    private boolean featured = false; // Changed from Boolean to primitive boolean
+    private boolean featured = false;
 
     private String imageUrl;
 }
