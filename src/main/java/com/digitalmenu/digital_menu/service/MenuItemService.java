@@ -1,7 +1,9 @@
 package com.digitalmenu.digital_menu.service;
 
+import com.digitalmenu.digital_menu.entity.Business;
 import com.digitalmenu.digital_menu.entity.Category;
 import com.digitalmenu.digital_menu.model.MenuItem;
+import com.digitalmenu.digital_menu.repository.BusinessRepository;
 import com.digitalmenu.digital_menu.repository.CategoryRepository;
 import com.digitalmenu.digital_menu.repository.MenuItemRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,13 +21,16 @@ public class MenuItemService {
 
     private final MenuItemRepository menuItemRepository;
     private final CategoryRepository categoryRepository;
+    private final BusinessRepository businessRepository;
     private final Path uploadPath;
 
     public MenuItemService(MenuItemRepository menuItemRepository,
                            CategoryRepository categoryRepository,
+                           BusinessRepository businessRepository,
                            @Value("${app.upload.dir:uploads}") String uploadDir) throws IOException {
         this.menuItemRepository = menuItemRepository;
         this.categoryRepository = categoryRepository;
+        this.businessRepository = businessRepository;
         this.uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
 
         if (!Files.exists(this.uploadPath)) {
@@ -43,11 +48,11 @@ public class MenuItemService {
     }
 
     public MenuItem saveItem(String name, String description, BigDecimal price, Long categoryId, MultipartFile imageFile) throws IOException {
-        // Safe lookup: auto-create category if it doesn't exist yet in PostgreSQL
+        // Safe lookup: auto-create category if missing and attach a valid Business entity
         Category category = categoryRepository.findById(categoryId).orElseGet(() -> {
             Category newCat = new Category();
             newCat.setId(categoryId);
-            // Assign default names based on standard mapping
+            
             String catName = switch (categoryId.intValue()) {
                 case 1 -> "Morning";
                 case 2 -> "Starters";
@@ -59,6 +64,19 @@ public class MenuItemService {
             };
             newCat.setName(catName);
             newCat.setActive(true);
+            newCat.setDisplayOrder(0);
+
+            // Fetch or create default Business (ID 1) to satisfy the not-null constraint
+            Business business = businessRepository.findById(1L).orElseGet(() -> {
+                Business b = new Business();
+                b.setId(1L);
+                b.setName("Paleo Hotel & Spa");
+                b.setSlug("paleo-hotel-spa");
+                b.setActive(true);
+                return businessRepository.save(b);
+            });
+            newCat.setBusiness(business);
+
             return categoryRepository.save(newCat);
         });
 
