@@ -42,7 +42,7 @@ public class MenuItemService {
 
     @Transactional(readOnly = true)
     public List<MenuItem> getAllItems() {
-        return menuItemRepository.findAll();
+        return menuItemRepository.findAllWithCategoryAndBusiness();
     }
 
     @Transactional(readOnly = true)
