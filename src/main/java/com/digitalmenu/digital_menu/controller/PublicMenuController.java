@@ -35,9 +35,8 @@ public class PublicMenuController {
     @GetMapping("/{slug}")
     public ResponseEntity<PublicMenuDTO> getPublicMenu(@PathVariable String slug) {
         try {
-            // Using findBySlug to avoid any boolean-matching query derivation issues
-            Business business = businessRepository.findBySlug(slug)
-                    .orElseThrow(() -> new RuntimeException("Business not found with slug: " + slug));
+            Business business = businessRepository.findBySlugAndActiveTrue(slug)
+                    .orElseThrow(() -> new RuntimeException("Business not found or inactive: " + slug));
 
             PublicMenuDTO menuDTO = new PublicMenuDTO();
 
@@ -69,7 +68,7 @@ public class PublicMenuController {
                     iDto.setName(item.getName());
                     iDto.setDescription(item.getDescription());
                     iDto.setPrice(item.getPrice());
-                    iDto.setImageUrl(item.getImageUrl());
+                    iDto.setImageUrl(item.ImageUrl());
                     iDto.setFeatured(item.isFeatured());
                     return iDto;
                 }).collect(Collectors.toList());
@@ -82,7 +81,7 @@ public class PublicMenuController {
 
             return ResponseEntity.ok(menuDTO);
         } catch (Exception e) {
-            e.printStackTrace(); // Prints exact error stack trace to Render Live Logs
+            e.printStackTrace();
             throw e;
         }
     }
