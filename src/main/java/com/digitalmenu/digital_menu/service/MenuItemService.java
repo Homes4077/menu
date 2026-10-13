@@ -23,7 +23,7 @@ public class MenuItemService {
 
     public MenuItemService(MenuItemRepository menuItemRepository,
                            CategoryRepository categoryRepository,
-                           @Value("${app.upload.dir}") String uploadDir) throws IOException {
+                           @Value("${app.upload.dir:uploads}") String uploadDir) throws IOException {
         this.menuItemRepository = menuItemRepository;
         this.categoryRepository = categoryRepository;
         this.uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
@@ -43,17 +43,37 @@ public class MenuItemService {
     }
 
     public MenuItem saveItem(String name, String description, BigDecimal price, Long categoryId, MultipartFile imageFile) throws IOException {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryId));
+        // Safe lookup: auto-create category if it doesn't exist yet in PostgreSQL
+        Category category = categoryRepository.findById(categoryId).orElseGet(() -> {
+            Category newCat = new Category();
+            newCat.setId(categoryId);
+            // Assign default names based on standard mapping
+            String catName = switch (categoryId.intValue()) {
+                case 1 -> "Morning";
+                case 2 -> "Starters";
+                case 3 -> "Mains";
+                case 4 -> "Desserts";
+                case 5 -> "Soft Drinks";
+                case 6 -> "Liquor";
+                default -> "General";
+            };
+            newCat.setName(catName);
+            newCat.setActive(true);
+            return categoryRepository.save(newCat);
+        });
 
         MenuItem item = new MenuItem();
         item.setName(name);
         item.setDescription(description);
         item.setPrice(price);
         item.setCategory(category);
+        item.setAvailable(true);
+        item.setFeatured(false);
 
         if (imageFile != null && !imageFile.isEmpty()) {
             item.setImageUrl(storeFile(imageFile));
+        } else {
+            item.setImageUrl("https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80");
         }
 
         return menuItemRepository.save(item);
@@ -61,8 +81,8 @@ public class MenuItemService {
 
     public MenuItem updateItem(Long id, String name, String description, BigDecimal price, Long categoryId, MultipartFile imageFile) throws IOException {
         MenuItem item = getItemById(id);
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + categoryId));
+        
+        Category category = categoryRepository.findById(categoryId).orElse(item.getCategory());
 
         item.setName(name);
         item.setDescription(description);
@@ -70,7 +90,7 @@ public class MenuItemService {
         item.setCategory(category);
 
         if (imageFile != null && !imageFile.isEmpty()) {
-            if (item.getImageUrl() != null) {
+            if (item.getImageUrl() != null && item.getImageUrl().startsWith("/images/dishes/")) {
                 deleteOldFile(item.getImageUrl());
             }
             item.setImageUrl(storeFile(imageFile));
@@ -81,7 +101,7 @@ public class MenuItemService {
 
     public void deleteItem(Long id) {
         MenuItem item = getItemById(id);
-        if (item.getImageUrl() != null) {
+        if (item.getImageUrl() != null && item.getImageUrl().startsWith("/images/dishes/")) {
             deleteOldFile(item.getImageUrl());
         }
         menuItemRepository.deleteById(id);
