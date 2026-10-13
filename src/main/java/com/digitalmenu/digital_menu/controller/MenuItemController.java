@@ -32,22 +32,23 @@ public class MenuItemController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MenuItem> createItem(
+    public ResponseEntity<Void> createItem(
             @RequestParam("name") String name,
             @RequestParam("description") String description,
             @RequestParam("price") BigDecimal price,
             @RequestParam("categoryId") Long categoryId,
             @RequestParam(value = "image", required = false) MultipartFile image) {
         try {
-            MenuItem created = menuItemService.saveItem(name, description, price, categoryId, image);
-            return ResponseEntity.ok(created);
+            menuItemService.saveItem(name, description, price, categoryId, image);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<MenuItem> updateItem(
+    public ResponseEntity<Void> updateItem(
             @PathVariable Long id,
             @RequestParam("name") String name,
             @RequestParam("description") String description,
@@ -55,9 +56,10 @@ public class MenuItemController {
             @RequestParam("categoryId") Long categoryId,
             @RequestParam(value = "image", required = false) MultipartFile image) {
         try {
-            MenuItem updated = menuItemService.updateItem(id, name, description, price, categoryId, image);
-            return ResponseEntity.ok(updated);
+            menuItemService.updateItem(id, name, description, price, categoryId, image);
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
     }
