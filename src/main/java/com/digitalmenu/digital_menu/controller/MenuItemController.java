@@ -22,13 +22,25 @@ public class MenuItemController {
     }
 
     @GetMapping
-    public List<MenuItem> getAll() {
-        return menuItemService.getAllItems();
+    public ResponseEntity<List<MenuItem>> getAll() {
+        try {
+            List<MenuItem> items = menuItemService.getAllItems();
+            return ResponseEntity.ok(items);
+        } catch (Exception e) {
+            e.printStackTrace(); // Prints the exact error to Render Live Logs
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @GetMapping("/{id}")
-    public MenuItem getById(@PathVariable Long id) {
-        return menuItemService.getItemById(id);
+    public ResponseEntity<MenuItem> getById(@PathVariable Long id) {
+        try {
+            MenuItem item = menuItemService.getItemById(id);
+            return ResponseEntity.ok(item);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -66,7 +78,12 @@ public class MenuItemController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
-        menuItemService.deleteItem(id);
-        return ResponseEntity.noContent().build();
+        try {
+            menuItemService.deleteItem(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
