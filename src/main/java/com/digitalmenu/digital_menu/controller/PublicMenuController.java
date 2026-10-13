@@ -8,6 +8,7 @@ import com.digitalmenu.digital_menu.repository.BusinessRepository;
 import com.digitalmenu.digital_menu.repository.CategoryRepository;
 import com.digitalmenu.digital_menu.repository.MenuItemRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/public/menu")
 @CrossOrigin(origins = "*")
+@Transactional(readOnly = true) // <-- Keeps the Hibernate session open for all endpoints in this controller
 public class PublicMenuController {
 
     private final BusinessRepository businessRepository;
