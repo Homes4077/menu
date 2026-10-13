@@ -1,5 +1,6 @@
 package com.digitalmenu.digital_menu.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,6 +9,7 @@ import lombok.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Category {
 
     @Id
@@ -16,6 +18,7 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "business_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "categories", "menuItems"})
     private Business business;
 
     @Column(nullable = false)
