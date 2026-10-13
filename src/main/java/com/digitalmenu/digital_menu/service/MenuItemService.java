@@ -8,6 +8,7 @@ import com.digitalmenu.digital_menu.repository.CategoryRepository;
 import com.digitalmenu.digital_menu.repository.MenuItemRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class MenuItemService {
 
     private final MenuItemRepository menuItemRepository;
@@ -38,17 +40,18 @@ public class MenuItemService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<MenuItem> getAllItems() {
         return menuItemRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public MenuItem getItemById(Long id) {
         return menuItemRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Dish not found with id: " + id));
     }
 
     public MenuItem saveItem(String name, String description, BigDecimal price, Long categoryId, MultipartFile imageFile) throws IOException {
-        // Safe lookup: auto-create category if missing and attach a valid Business entity
         Category category = categoryRepository.findById(categoryId).orElseGet(() -> {
             Category newCat = new Category();
             newCat.setId(categoryId);
@@ -66,7 +69,6 @@ public class MenuItemService {
             newCat.setActive(true);
             newCat.setDisplayOrder(0);
 
-            // Fetch or create default Business (ID 1) to satisfy the not-null constraint
             Business business = businessRepository.findById(1L).orElseGet(() -> {
                 Business b = new Business();
                 b.setId(1L);
