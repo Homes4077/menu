@@ -73,11 +73,10 @@ public class PublicMenuController {
                 cDto.setName(cat.getName());
                 cDto.setDescription(cat.getDescription());
 
-                // Fetch items for this category, with a fallback to available items if category mapping is empty
                 List<MenuItem> items = menuItemRepository.findByCategoryIdAndAvailableTrueOrderByDisplayOrderAsc(cat.getId());
                 if (items.isEmpty()) {
                     items = menuItemRepository.findAll().stream()
-                            .filter(MenuItem::isAvailable)
+                            .filter(item -> item.isAvailable())
                             .collect(Collectors.toList());
                 }
 
