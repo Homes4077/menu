@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -35,19 +36,25 @@ public class PublicMenuController {
     @GetMapping("/{slug}")
     public ResponseEntity<PublicMenuDTO> getPublicMenu(@PathVariable String slug) {
         try {
-            // Auto-heal / seed the business if it doesn't exist yet without forcing a manual ID
-            Business business = businessRepository.findBySlug(slug)
-                    .orElseGet(() -> {
-                        Business b = new Business();
-                        b.setName("Paleo Hotel & Spa");
-                        b.setSlug(slug);
-                        b.setDescription("Experience luxury dining and relaxation.");
-                        b.setActive(true);
-                        return businessRepository.save(b);
-                    });
+            Optional<Business> optionalBusiness = businessRepository.findBySlug(slug);
+            Business business;
+
+            if (optionalBusiness.isPresent()) {
+                business = optionalBusiness.get();
+            } else {
+                // Create the record if it doesn't exist yet
+                Business newBusiness = new Business();
+                newBusiness.setName("Paleo Hotel & Spa");
+                newBusiness.setSlug(slug);
+                newBusiness.setDescription("Experience luxury dining and relaxation.");
+                newBusiness.setWhatsappNumber("+254700000000");
+                newBusiness.setActive(true);
+                business = businessRepository.save(newBusiness);
+            }
 
             if (!business.isActive()) {
                 business.setActive(true);
+                business = businessRepository.save(business);
             }
 
             PublicMenuDTO menuDTO = new PublicMenuDTO();
