@@ -35,13 +35,12 @@ public class PublicMenuController {
     @GetMapping("/{slug}")
     public ResponseEntity<PublicMenuDTO> getPublicMenu(@PathVariable String slug) {
         try {
-            // Auto-heal / seed the business if it doesn't exist yet
+            // Auto-heal / seed the business if it doesn't exist yet without forcing a manual ID
             Business business = businessRepository.findBySlug(slug)
                     .orElseGet(() -> {
                         Business b = new Business();
-                        b.setId(1L);
                         b.setName("Paleo Hotel & Spa");
-                        b.setSlug("paleo-hotel-spa");
+                        b.setSlug(slug);
                         b.setDescription("Experience luxury dining and relaxation.");
                         b.setActive(true);
                         return businessRepository.save(b);
