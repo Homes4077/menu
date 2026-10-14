@@ -75,9 +75,7 @@ public class PublicMenuController {
 
                 List<MenuItem> items = menuItemRepository.findByCategoryIdAndAvailableTrueOrderByDisplayOrderAsc(cat.getId());
                 if (items.isEmpty()) {
-                    items = menuItemRepository.findAll().stream()
-                            .filter(item -> item.isAvailable())
-                            .collect(Collectors.toList());
+                    items = menuItemRepository.findAll();
                 }
 
                 List<PublicMenuDTO.ItemDTO> itemDTOs = items.stream().map(item -> {
