@@ -74,7 +74,7 @@ public class PublicMenuController {
                 cDto.setName(cat.getName());
                 cDto.setDescription(cat.getDescription());
 
-                // Match items by category relationship object safely
+                // Try matching by category ID first; if none match, fallback to showing all items so nothing is hidden
                 List<MenuItem> items = allItems.stream()
                         .filter(item -> item.getCategory() != null && item.getCategory().getId().equals(cat.getId()))
                         .collect(Collectors.toList());
