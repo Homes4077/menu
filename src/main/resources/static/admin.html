@@ -315,7 +315,7 @@
 
     async function loadCategories() {
         try {
-            const res = await fetch('/api/public/menu/paleo-hotel-spa');
+            const res = await fetch(`${window.location.origin}/api/public/menu/paleo-hotel-spa`);
             if (res.ok) {
                 const data = await res.json();
                 if (data.categories) {
@@ -333,7 +333,7 @@
 
     async function loadItems() {
         try {
-            const response = await fetch(API_URL);
+            const response = await fetch(`${window.location.origin}${API_URL}`);
             items = response.ok ? await response.json() : [];
         } catch(e) {
             console.warn("Could not fetch items from backend.", e);
@@ -344,7 +344,7 @@
 
     async function saveItem(formData, editId) {
         try {
-            const url = editId ? `${API_URL}/${editId}` : API_URL;
+            const url = editId ? `${window.location.origin}${API_URL}/${editId}` : `${window.location.origin}${API_URL}`;
             const method = editId ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
@@ -355,16 +355,19 @@
             if (response.ok) {
                 loadItems();
             } else {
+                const errText = await response.text();
+                console.error("Server error response:", errText);
                 alert("Failed to save dish to database.");
             }
         } catch (e) {
             console.error("Network error while saving dish", e);
+            alert("Network connection error. Please check your connection.");
         }
     }
 
     async function deleteItemBackend(id) {
         try {
-            const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            const response = await fetch(`${window.location.origin}${API_URL}/${id}`, { method: 'DELETE' });
             if (response.ok) {
                 loadItems();
             }
@@ -381,7 +384,7 @@
         }
 
         list.innerHTML = items.map((item) => {
-            const catName = item.category ? item.category.name : 'Main';
+            const catName = item.category ? item.category.name : 'General';
             return `
                 <div class="item-card">
                     <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}" alt="${item.name}">
