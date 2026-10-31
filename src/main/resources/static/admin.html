@@ -225,7 +225,7 @@
         <select id="fCategory">
             <option value="morning">Morning</option>
             <option value="starter">Starters</option>
-            <option value="main">Main</option>
+            <option value="specials">Day's Specials</option>
             <option value="dessert">Desserts</option>
             <option value="soft drinks">Soft Drinks</option>
             <option value="liquor">Liquor (18+)</option>
@@ -320,7 +320,7 @@
     const categoryMap = {
         "morning": 1,
         "starter": 2,
-        "main": 3,
+        "specials": 3,
         "dessert": 4,
         "soft drinks": 5,
         "liquor": 6
@@ -329,7 +329,7 @@
     const reverseCategoryMap = {
         1: "morning",
         2: "starter",
-        3: "main",
+        3: "specials",
         4: "dessert",
         5: "soft drinks",
         6: "liquor"
@@ -385,7 +385,7 @@
         }
 
         list.innerHTML = items.map((item) => {
-            const catName = item.category ? item.category.name : 'Main';
+            const catName = item.category ? item.category.name : "Day's Specials";
             return `
                 <div class="item-card">
                     <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}" alt="${item.name}">
@@ -417,7 +417,7 @@
         document.getElementById('modalTitle').textContent = "Add New Dish";
         document.getElementById('editId').value = "";
         document.getElementById('fName').value = "";
-        document.getElementById('fCategory').value = "main";
+        document.getElementById('fCategory').value = "specials";
         document.getElementById('fPrice').value = "";
         document.getElementById('fDesc').value = "";
         selectedFile = null;
@@ -433,9 +433,9 @@
         document.getElementById('editId').value = item.id;
         document.getElementById('fName').value = item.name;
         
-        let catKey = 'main';
+        let catKey = 'specials';
         if (item.category && item.category.id) {
-            catKey = reverseCategoryMap[item.category.id] || 'main';
+            catKey = reverseCategoryMap[item.category.id] || 'specials';
         }
         document.getElementById('fCategory').value = catKey;
         document.getElementById('fPrice').value = item.price;
@@ -507,6 +507,7 @@
         qrModal.showModal();
     });
 
+    document.getElementById('qrConsoleClose') // handled via qrClose
     document.getElementById('qrClose').addEventListener('click', () => qrModal.close());
 
     loadItems();
