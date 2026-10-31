@@ -66,6 +66,7 @@ public class PublicMenuController {
             menuDTO.setBusiness(bDto);
 
             List<Category> categories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
+            List<MenuItem> allItems = menuItemRepository.findAll();
 
             List<PublicMenuDTO.CategoryDTO> categoryDTOs = categories.stream().map(cat -> {
                 PublicMenuDTO.CategoryDTO cDto = new PublicMenuDTO.CategoryDTO();
@@ -73,9 +74,13 @@ public class PublicMenuController {
                 cDto.setName(cat.getName());
                 cDto.setDescription(cat.getDescription());
 
-                List<MenuItem> items = menuItemRepository.findByCategoryIdAndAvailableTrueOrderByDisplayOrderAsc(cat.getId());
+                // Match items by categoryId, or fallback to all items if none match directly
+                List<MenuItem> items = allItems.stream()
+                        .filter(item -> item.getCategoryId() != null && item.getCategoryId().equals(cat.getId()))
+                        .collect(Collectors.toList());
+
                 if (items.isEmpty()) {
-                    items = menuItemRepository.findAll();
+                    items = allItems;
                 }
 
                 List<PublicMenuDTO.ItemDTO> itemDTOs = items.stream().map(item -> {
