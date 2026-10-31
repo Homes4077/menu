@@ -33,19 +33,16 @@ public class MenuItemController {
         try {
             MenuItem item = new MenuItem();
             item.setName(name);
-            item.setDescription(description);
+            item.setDescription(description != null ? description : "");
             item.setPrice(price);
             item.setAvailable(true);
 
-            // Fetch and set the correct category using the ID sent from admin.html
             Category category = categoryRepository.findById(categoryId)
                     .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
             item.setCategory(category);
 
-            // Handle image URL / storage logic as configured in your project
             if (image != null && !image.isEmpty()) {
-                // If using local file storage path / saving logic:
-                item.setImageUrl("https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80"); // fallback or your file storage logic
+                item.setImageUrl("https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80");
             } else {
                 item.setImageUrl("https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80");
             }
@@ -71,7 +68,7 @@ public class MenuItemController {
                     .orElseThrow(() -> new RuntimeException("Item not found"));
 
             item.setName(name);
-            item.setDescription(description);
+            item.setDescription(description != null ? description : "");
             item.setPrice(price);
 
             Category category = categoryRepository.findById(categoryId)
