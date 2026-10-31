@@ -223,12 +223,7 @@
     <div class="field">
         <label for="fCategory">Category</label>
         <select id="fCategory">
-            <option value="morning">Morning</option>
-            <option value="starter">Starters</option>
-            <option value="specials">Day's Specials</option>
-            <option value="dessert">Desserts</option>
-            <option value="soft drinks">Soft Drinks</option>
-            <option value="liquor">Liquor (18+)</option>
+            <!-- Dynamically populated from database categories -->
         </select>
     </div>
     <div class="field">
@@ -316,24 +311,25 @@
     // --- BACKEND API INTEGRATION ---
     const API_URL = "/api/menu-items";
     let items = [];
+    let categoriesList = [];
 
-    const categoryMap = {
-        "morning": 1,
-        "starter": 2,
-        "specials": 3,
-        "dessert": 4,
-        "soft drinks": 5,
-        "liquor": 6
-    };
-
-    const reverseCategoryMap = {
-        1: "morning",
-        2: "starter",
-        3: "specials",
-        4: "dessert",
-        5: "soft drinks",
-        6: "liquor"
-    };
+    async function loadCategories() {
+        try {
+            const res = await fetch('/api/public/menu/paleo-hotel-spa');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.categories) {
+                    categoriesList = data.categories;
+                    const selectEl = document.getElementById('fCategory');
+                    selectEl.innerHTML = categoriesList.map(cat => `
+                        <option value="${cat.id}">${cat.name}</option>
+                    `).join('');
+                }
+            }
+        } catch (e) {
+            console.warn("Could not load categories dynamically", e);
+        }
+    }
 
     async function loadItems() {
         try {
@@ -385,7 +381,7 @@
         }
 
         list.innerHTML = items.map((item) => {
-            const catName = item.category ? item.category.name : "Day's Specials";
+            const catName = item.category ? item.category.name : 'Main';
             return `
                 <div class="item-card">
                     <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}" alt="${item.name}">
@@ -417,7 +413,9 @@
         document.getElementById('modalTitle').textContent = "Add New Dish";
         document.getElementById('editId').value = "";
         document.getElementById('fName').value = "";
-        document.getElementById('fCategory').value = "specials";
+        if (categoriesList.length > 0) {
+            document.getElementById('fCategory').value = categoriesList[0].id;
+        }
         document.getElementById('fPrice').value = "";
         document.getElementById('fDesc').value = "";
         selectedFile = null;
@@ -433,11 +431,9 @@
         document.getElementById('editId').value = item.id;
         document.getElementById('fName').value = item.name;
         
-        let catKey = 'specials';
         if (item.category && item.category.id) {
-            catKey = reverseCategoryMap[item.category.id] || 'specials';
+            document.getElementById('fCategory').value = item.category.id;
         }
-        document.getElementById('fCategory').value = catKey;
         document.getElementById('fPrice').value = item.price;
         document.getElementById('fDesc').value = item.description || '';
         selectedFile = null;
@@ -456,7 +452,7 @@
 
     document.getElementById('modalSave').addEventListener('click', () => {
         const name = document.getElementById('fName').value.trim();
-        const categoryKey = document.getElementById('fCategory').value;
+        const categoryId = document.getElementById('fCategory').value;
         const price = document.getElementById('fPrice').value;
         const description = document.getElementById('fDesc').value.trim();
         const editId = document.getElementById('editId').value;
@@ -466,8 +462,6 @@
             err.textContent = "Please fill in both the dish name and price.";
             return;
         }
-
-        const categoryId = categoryMap[categoryKey] || 3;
 
         const formData = new FormData();
         formData.append("name", name);
@@ -507,10 +501,9 @@
         qrModal.showModal();
     });
 
-    document.getElementById('qrConsoleClose') // handled via qrClose
     document.getElementById('qrClose').addEventListener('click', () => qrModal.close());
 
-    loadItems();
+    loadCategories().then(() => loadItems());
 </script>
 </body>
 </html>
