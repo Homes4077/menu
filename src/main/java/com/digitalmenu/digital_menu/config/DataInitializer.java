@@ -4,9 +4,11 @@ import com.digitalmenu.digital_menu.entity.Business;
 import com.digitalmenu.digital_menu.entity.Category;
 import com.digitalmenu.digital_menu.repository.BusinessRepository;
 import com.digitalmenu.digital_menu.repository.CategoryRepository;
+import com.digitalmenu.digital_menu.repository.MenuItemRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,10 +16,11 @@ import java.util.List;
 public class DataInitializer {
 
     @Bean
+    @Transactional
     public CommandLineRunner initializeCategories(BusinessRepository businessRepository,
-                                                  CategoryRepository categoryRepository) {
+                                                  CategoryRepository categoryRepository,
+                                                  MenuItemRepository menuItemRepository) {
         return args -> {
-            // 1. Ensure the default business exists
             String slug = "paleo-hotel-spa";
             Business business = businessRepository.findBySlug(slug).orElseGet(() -> {
                 Business newBusiness = new Business();
@@ -29,37 +32,37 @@ public class DataInitializer {
                 return businessRepository.save(newBusiness);
             });
 
-            // 2. Define the exact 6 categories required
-            List<String> requiredCategories = List.of(
-                    "Morning", 
-                    "Starters", 
-                    "Main", 
-                    "Desserts", 
-                    "Soft Drinks", 
-                    "Liquor (18+)"
-            );
+            // Clean reset of categories if old/unwanted ones like "Gourmet Mains" exist
+            List<Category> existingCategories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
+            boolean hasOldCategories = existingCategories.stream().anyMatch(c -> c.getName().equalsIgnoreCase("Gourmet Mains"));
 
-            // 3. Check and seed missing categories safely
-            int order = 1;
-            for (String catName : requiredCategories) {
-                boolean exists = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId())
-                        .stream()
-                        .anyMatch(c -> c.getName().equalsIgnoreCase(catName));
+            if (hasOldCategories || existingCategories.size() != 6) {
+                System.out.println("[DataInitializer] Resetting categories to match the exact 6 required layout...");
+                // Note: If menu items reference these categories, you may need to unassign them first or let cascade handle it.
+                categoryRepository.deleteAll(existingCategories);
+                
+                List<String> requiredCategories = List.of(
+                        "Morning", 
+                        "Starters", 
+                        "Day's Specials", 
+                        "Desserts", 
+                        "Soft Drinks", 
+                        "Liquor (18+)"
+                );
 
-                if (!exists) {
+                int order = 1;
+                for (String catName : requiredCategories) {
                     Category category = new Category();
                     category.setName(catName);
                     category.setDescription("Freshly prepared " + catName.toLowerCase());
                     category.setBusiness(business);
                     category.setActive(true);
-                    category.setDisplayOrder(order);
+                    category.setDisplayOrder(order++);
                     categoryRepository.save(category);
-                    System.out.println("[DataInitializer] Seeded category: " + catName);
                 }
-                order++;
             }
 
-            // 4. Verification step: Log all active categories stored in the database
+            // Verification log
             System.out.println("=== VERIFYING DATABASE CATEGORIES ON STARTUP ===");
             categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId()).forEach(cat -> {
                 System.out.println("-> Category ID: " + cat.getId() + " | Name: " + cat.getName() + " | Order: " + cat.getDisplayOrder());
