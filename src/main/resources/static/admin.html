@@ -215,7 +215,14 @@
     </div>
     <div class="field">
         <label for="fCategory">Category</label>
-        <select id="fCategory"></select>
+        <select id="fCategory">
+            <option value="morning">Morning</option>
+            <option value="starter">Starters</option>
+            <option value="main">Main</option>
+            <option value="dessert">Desserts</option>
+            <option value="soft drinks">Soft Drinks</option>
+            <option value="liquor">Liquor (18+)</option>
+        </select>
     </div>
     <div class="field">
         <label for="fPrice">Price (Ksh)</label>
@@ -226,7 +233,7 @@
         <textarea id="fDesc" rows="2" placeholder="Brief appetizing description..."></textarea>
     </div>
     <div class="field">
-        <label for="fImageUrl">Dish Image URL (e.g. Unsplash link)</label>
+        <label for="fImageUrl">Image URL (Persistent Link)</label>
         <input id="fImageUrl" type="url" placeholder="https://images.unsplash.com/photo-...">
     </div>
     <div class="err" id="formErr"></div>
@@ -299,23 +306,24 @@
     // --- BACKEND API INTEGRATION ---
     const API_URL = "/api/menu-items";
     let items = [];
-    let categories = [];
 
-    async function loadCategories() {
-        try {
-            const res = await fetch('/api/public/menu/paleo-hotel-spa');
-            if (res.ok) {
-                const data = await res.json();
-                if (data.categories) {
-                    categories = data.categories;
-                    const select = document.getElementById('fCategory');
-                    select.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
-                }
-            }
-        } catch(e) {
-            console.error("Failed to load categories", e);
-        }
-    }
+    const categoryMap = {
+        "morning": 1,
+        "starter": 2,
+        "main": 3,
+        "dessert": 4,
+        "soft drinks": 5,
+        "liquor": 6
+    };
+
+    const reverseCategoryMap = {
+        1: "morning",
+        2: "starter",
+        3: "main",
+        4: "dessert",
+        5: "soft drinks",
+        6: "liquor"
+    };
 
     async function loadItems() {
         try {
@@ -368,7 +376,7 @@
         }
 
         list.innerHTML = items.map((item) => {
-            const catName = item.category ? item.category.name : 'Gourmet Mains';
+            const catName = item.category ? item.category.name : 'Main';
             return `
                 <div class="item-card">
                     <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}" alt="${item.name}">
@@ -392,9 +400,7 @@
         document.getElementById('modalTitle').textContent = "Add New Dish";
         document.getElementById('editId').value = "";
         document.getElementById('fName').value = "";
-        if (categories.length > 0) {
-            document.getElementById('fCategory').value = categories[0].id;
-        }
+        document.getElementById('fCategory').value = "main";
         document.getElementById('fPrice').value = "";
         document.getElementById('fDesc').value = "";
         document.getElementById('fImageUrl').value = "";
@@ -408,9 +414,12 @@
         document.getElementById('modalTitle').textContent = "Edit Dish";
         document.getElementById('editId').value = item.id;
         document.getElementById('fName').value = item.name;
+        
+        let catKey = 'main';
         if (item.category && item.category.id) {
-            document.getElementById('fCategory').value = item.category.id;
+            catKey = reverseCategoryMap[item.category.id] || 'main';
         }
+        document.getElementById('fCategory').value = catKey;
         document.getElementById('fPrice').value = item.price;
         document.getElementById('fDesc').value = item.description || '';
         document.getElementById('fImageUrl').value = item.imageUrl || '';
@@ -428,7 +437,7 @@
 
     document.getElementById('modalSave').addEventListener('click', () => {
         const name = document.getElementById('fName').value.trim();
-        const categoryId = document.getElementById('fCategory').value;
+        const categoryKey = document.getElementById('fCategory').value;
         const price = document.getElementById('fPrice').value;
         const description = document.getElementById('fDesc').value.trim();
         const imageUrl = document.getElementById('fImageUrl').value.trim();
@@ -440,14 +449,16 @@
             return;
         }
 
+        const categoryId = categoryMap[categoryKey] || 3;
+
         const payload = {
             name: name,
             description: description,
-            price: Number(price),
+            price: parseFloat(price),
             imageUrl: imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+            category: { id: categoryId },
             available: true,
-            featured: false,
-            category: { id: Number(categoryId) }
+            featured: false
         };
 
         saveItem(payload, editId);
@@ -455,7 +466,7 @@
     });
 
     // QR Code Handler
-    const QRModal = document.getElementById('qrModal');
+    const qrModal = document.getElementById('qrModal');
     const menuUrlInput = document.getElementById('menuUrl');
     const currentMenuLink = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
 
@@ -481,7 +492,7 @@
 
     document.getElementById('qrClose').addEventListener('click', () => qrModal.close());
 
-    loadCategories().then(() => loadItems());
+    loadItems();
 </script>
 </body>
 </html>
