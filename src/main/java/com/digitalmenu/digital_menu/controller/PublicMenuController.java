@@ -52,8 +52,10 @@ public class PublicMenuController {
                 business = businessRepository.save(business);
             }
 
-            // Ensure categories exist; if none exist, seed default categories and items
+            // Fetch active categories for this business
             List<Category> categories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
+            
+            // Auto-seed default category if none exist
             if (categories.isEmpty()) {
                 Category mains = new Category();
                 mains.setName("Gourmet Mains");
@@ -62,16 +64,6 @@ public class PublicMenuController {
                 mains.setActive(true);
                 mains.setDisplayOrder(1);
                 categoryRepository.save(mains);
-
-                MenuItem item = new MenuItem();
-                item.setName("21-Day Aged Ribeye Steak");
-                item.setDescription("Prime beef cut served with truffle mash.");
-                item.setPrice(BigDecimal.valueOf(2400.00));
-                item.setCategory(mains);
-                item.setAvailable(true);
-                item.setFeatured(true);
-                item.setDisplayOrder(1);
-                menuItemRepository.save(item);
 
                 categories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
             }
@@ -99,13 +91,10 @@ public class PublicMenuController {
                 cDto.setName(cat.getName());
                 cDto.setDescription(cat.getDescription());
 
+                // Strictly map items belonging to this category ID
                 List<MenuItem> items = allItems.stream()
                         .filter(item -> item.getCategory() != null && item.getCategory().getId().equals(cat.getId()))
                         .collect(Collectors.toList());
-
-                if (items.isEmpty()) {
-                    items = allItems;
-                }
 
                 List<PublicMenuDTO.ItemDTO> itemDTOs = items.stream().map(item -> {
                     PublicMenuDTO.ItemDTO iDto = new PublicMenuDTO.ItemDTO();
