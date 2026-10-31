@@ -15,7 +15,7 @@ import java.util.Base64;
 @RestController
 @RequestMapping("/api/menu-items")
 @CrossOrigin(origins = "*")
-@Transactional // Keeps the database session open for lazy-loaded relationships during JSON serialization
+@Transactional
 public class MenuItemController {
 
     private final MenuItemRepository menuItemRepository;
