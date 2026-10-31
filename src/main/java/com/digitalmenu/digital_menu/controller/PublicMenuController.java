@@ -52,19 +52,22 @@ public class PublicMenuController {
                 business = businessRepository.save(business);
             }
 
-            // Fetch active categories for this business
+            // Fetch active categories; if none exist, seed the 6 requested categories
             List<Category> categories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
-            
-            // Auto-seed default category if none exist
             if (categories.isEmpty()) {
-                Category mains = new Category();
-                mains.setName("Gourmet Mains");
-                mains.setDescription("Prime dishes prepared by our chef");
-                mains.setBusiness(business);
-                mains.setActive(true);
-                mains.setDisplayOrder(1);
-                categoryRepository.save(mains);
-
+                List<String> defaultCats = List.of(
+                    "Morning", "Starters", "Main", "Desserts", "Soft Drinks", "Liquor (18+)"
+                );
+                int order = 1;
+                for (String catName : defaultCats) {
+                    Category cat = new Category();
+                    cat.setName(catName);
+                    cat.setDescription("Delicious selections");
+                    cat.setBusiness(business);
+                    cat.setActive(true);
+                    cat.setDisplayOrder(order++);
+                    categoryRepository.save(cat);
+                }
                 categories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
             }
 
@@ -91,7 +94,6 @@ public class PublicMenuController {
                 cDto.setName(cat.getName());
                 cDto.setDescription(cat.getDescription());
 
-                // Strictly map items belonging to this category ID
                 List<MenuItem> items = allItems.stream()
                         .filter(item -> item.getCategory() != null && item.getCategory().getId().equals(cat.getId()))
                         .collect(Collectors.toList());
