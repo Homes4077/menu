@@ -1,5 +1,6 @@
 package com.digitalmenu.digital_menu.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,7 +19,7 @@ public class Category {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "business_id", nullable = false)
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "categories", "menuItems"})
+    @JsonIgnore // Prevents Jackson from trying to serialize the lazy Business proxy and throwing session errors
     private Business business;
 
     @Column(nullable = false)
