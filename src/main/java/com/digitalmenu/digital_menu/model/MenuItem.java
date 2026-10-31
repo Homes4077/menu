@@ -39,5 +39,6 @@ public class MenuItem {
 
     private boolean featured = false;
 
+    @Column(columnDefinition = "TEXT")
     private String imageUrl;
 }
