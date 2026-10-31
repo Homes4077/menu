@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/api/menu-items")
@@ -41,8 +42,10 @@ public class MenuItemController {
                     .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
             item.setCategory(category);
 
+            // Convert uploaded image to Base64 data string for persistent database storage
             if (image != null && !image.isEmpty()) {
-                item.setImageUrl("https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80");
+                String base64Image = "data:" + image.getContentType() + ";base64," + Base64.getEncoder().encodeToString(image.getBytes());
+                item.setImageUrl(base64Image);
             } else {
                 item.setImageUrl("https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80");
             }
@@ -51,7 +54,7 @@ public class MenuItemController {
             return ResponseEntity.ok(savedItem);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
 
@@ -75,11 +78,16 @@ public class MenuItemController {
                     .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
             item.setCategory(category);
 
+            if (image != null && !image.isEmpty()) {
+                String base64Image = "data:" + image.getContentType() + ";base64," + Base64.getEncoder().encodeToString(image.getBytes());
+                item.setImageUrl(base64Image);
+            }
+
             MenuItem updatedItem = menuItemRepository.save(item);
             return ResponseEntity.ok(updatedItem);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body("Error: " + e.getMessage());
         }
     }
 
