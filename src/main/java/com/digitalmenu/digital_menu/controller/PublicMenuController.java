@@ -74,9 +74,9 @@ public class PublicMenuController {
                 cDto.setName(cat.getName());
                 cDto.setDescription(cat.getDescription());
 
-                // Match items by categoryId, or fallback to all items if none match directly
+                // Match items by category relationship object safely
                 List<MenuItem> items = allItems.stream()
-                        .filter(item -> item.getCategoryId() != null && item.getCategoryId().equals(cat.getId()))
+                        .filter(item -> item.getCategory() != null && item.getCategory().getId().equals(cat.getId()))
                         .collect(Collectors.toList());
 
                 if (items.isEmpty()) {
