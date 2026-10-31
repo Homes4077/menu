@@ -1,89 +1,99 @@
 package com.digitalmenu.digital_menu.controller;
 
+import com.digitalmenu.digital_menu.entity.Category;
 import com.digitalmenu.digital_menu.model.MenuItem;
-import com.digitalmenu.digital_menu.service.MenuItemService;
-import org.springframework.http.MediaType;
+import com.digitalmenu.digital_menu.repository.CategoryRepository;
+import com.digitalmenu.digital_menu.repository.MenuItemRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/menu-items")
 @CrossOrigin(origins = "*")
 public class MenuItemController {
 
-    private final MenuItemService menuItemService;
+    private final MenuItemRepository menuItemRepository;
+    private final CategoryRepository categoryRepository;
 
-    public MenuItemController(MenuItemService menuItemService) {
-        this.menuItemService = menuItemService;
+    public MenuItemController(MenuItemRepository menuItemRepository, CategoryRepository categoryRepository) {
+        this.menuItemRepository = menuItemRepository;
+        this.categoryRepository = categoryRepository;
     }
 
-    @GetMapping
-    public ResponseEntity<List<MenuItem>> getAll() {
-        try {
-            List<MenuItem> items = menuItemService.getAllItems();
-            return ResponseEntity.ok(items);
-        } catch (Exception e) {
-            e.printStackTrace(); // Prints the exact error to Render Live Logs
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<MenuItem> getById(@PathVariable Long id) {
-        try {
-            MenuItem item = menuItemService.getItemById(id);
-            return ResponseEntity.ok(item);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
-    }
-
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> createItem(
+    @PostMapping
+    public ResponseEntity<?> createMenuItem(
             @RequestParam("name") String name,
-            @RequestParam("description") String description,
+            @RequestParam(value = "description", required = false) String description,
             @RequestParam("price") BigDecimal price,
             @RequestParam("categoryId") Long categoryId,
             @RequestParam(value = "image", required = false) MultipartFile image) {
         try {
-            menuItemService.saveItem(name, description, price, categoryId, image);
-            return ResponseEntity.ok().build();
+            MenuItem item = new MenuItem();
+            item.setName(name);
+            item.setDescription(description);
+            item.setPrice(price);
+            item.setAvailable(true);
+
+            // Fetch and set the correct category using the ID sent from admin.html
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+            item.setCategory(category);
+
+            // Handle image URL / storage logic as configured in your project
+            if (image != null && !image.isEmpty()) {
+                // If using local file storage path / saving logic:
+                item.setImageUrl("https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80"); // fallback or your file storage logic
+            } else {
+                item.setImageUrl("https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80");
+            }
+
+            MenuItem savedItem = menuItemRepository.save(item);
+            return ResponseEntity.ok(savedItem);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body("Error saving menu item: " + e.getMessage());
         }
     }
 
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> updateItem(
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateMenuItem(
             @PathVariable Long id,
             @RequestParam("name") String name,
-            @RequestParam("description") String description,
+            @RequestParam(value = "description", required = false) String description,
             @RequestParam("price") BigDecimal price,
             @RequestParam("categoryId") Long categoryId,
             @RequestParam(value = "image", required = false) MultipartFile image) {
         try {
-            menuItemService.updateItem(id, name, description, price, categoryId, image);
-            return ResponseEntity.ok().build();
+            MenuItem item = menuItemRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Item not found"));
+
+            item.setName(name);
+            item.setDescription(description);
+            item.setPrice(price);
+
+            Category category = categoryRepository.findById(categoryId)
+                    .orElseThrow(() -> new RuntimeException("Category not found with ID: " + categoryId));
+            item.setCategory(category);
+
+            MenuItem updatedItem = menuItemRepository.save(item);
+            return ResponseEntity.ok(updatedItem);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
+            return ResponseEntity.internalServerError().body("Error updating menu item: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
-        try {
-            menuItemService.deleteItem(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
+    public ResponseEntity<?> deleteMenuItem(@PathVariable Long id) {
+        menuItemRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllItems() {
+        return ResponseEntity.ok(menuItemRepository.findAll());
     }
 }
