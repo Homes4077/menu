@@ -11,13 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/public/menu")
 @CrossOrigin(origins = "*")
-@Transactional(readOnly = true)
+@Transactional
 public class PublicMenuController {
 
     private final BusinessRepository businessRepository;
@@ -48,7 +49,34 @@ public class PublicMenuController {
 
             if (!business.isActive()) {
                 business.setActive(true);
+                business = businessRepository.save(business);
             }
+
+            // Ensure categories exist; if none exist, seed default categories and items
+            List<Category> categories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
+            if (categories.isEmpty()) {
+                Category mains = new Category();
+                mains.setName("Gourmet Mains");
+                mains.setDescription("Prime dishes prepared by our chef");
+                mains.setBusiness(business);
+                mains.setActive(true);
+                mains.setDisplayOrder(1);
+                categoryRepository.save(mains);
+
+                MenuItem item = new MenuItem();
+                item.setName("21-Day Aged Ribeye Steak");
+                item.setDescription("Prime beef cut served with truffle mash.");
+                item.setPrice(BigDecimal.valueOf(2400.00));
+                item.setCategory(mains);
+                item.setAvailable(true);
+                item.setFeatured(true);
+                item.setDisplayOrder(1);
+                menuItemRepository.save(item);
+
+                categories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
+            }
+
+            List<MenuItem> allItems = menuItemRepository.findAll();
 
             PublicMenuDTO menuDTO = new PublicMenuDTO();
 
@@ -65,16 +93,12 @@ public class PublicMenuController {
             bDto.setTheme(business.getTheme());
             menuDTO.setBusiness(bDto);
 
-            List<Category> categories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
-            List<MenuItem> allItems = menuItemRepository.findAll();
-
             List<PublicMenuDTO.CategoryDTO> categoryDTOs = categories.stream().map(cat -> {
                 PublicMenuDTO.CategoryDTO cDto = new PublicMenuDTO.CategoryDTO();
                 cDto.setId(cat.getId());
                 cDto.setName(cat.getName());
                 cDto.setDescription(cat.getDescription());
 
-                // Try matching by category ID first; if none match, fallback to showing all items so nothing is hidden
                 List<MenuItem> items = allItems.stream()
                         .filter(item -> item.getCategory() != null && item.getCategory().getId().equals(cat.getId()))
                         .collect(Collectors.toList());
