@@ -146,6 +146,13 @@
         .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,182,39,.2)}
         .err{color:#ff8e82;font-size:.8rem;margin-bottom:10px;font-weight:500}
 
+        .file-upload-box {
+            border: 2px dashed var(--line); border-radius: 14px; padding: 14px; text-align: center;
+            background: rgba(255,255,255,0.02); cursor: pointer; position: relative; margin-top: 4px;
+        }
+        .file-upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+        .file-upload-box span { font-size: 0.8rem; color: var(--muted); }
+
         .modal-btns{display:flex;gap:10px;margin-top:16px}
         .btn-save{flex:1;background:linear-gradient(135deg, #ffc44d, var(--gold));color:#140f02;font-weight:700;padding:13px;border-radius:14px;cursor:pointer}
         .btn-cancel{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--line);padding:13px 20px;border-radius:14px;font-weight:600;cursor:pointer}
@@ -233,8 +240,11 @@
         <textarea id="fDesc" rows="2" placeholder="Brief appetizing description..."></textarea>
     </div>
     <div class="field">
-        <label for="fImageUrl">Image URL (Persistent Link)</label>
-        <input id="fImageUrl" type="url" placeholder="https://images.unsplash.com/photo-...">
+        <label>Upload Image from Local Device</label>
+        <div class="file-upload-box">
+            <span id="fileLabel">Tap to select photo from local files</span>
+            <input type="file" id="fFile" accept="image/*" onchange="handleFileSelect(event)">
+        </div>
     </div>
     <div class="err" id="formErr"></div>
     <div class="modal-btns">
@@ -336,15 +346,14 @@
         renderList();
     }
 
-    async function saveItem(payload, editId) {
+    async function saveItem(formData, editId) {
         try {
             const url = editId ? `${API_URL}/${editId}` : API_URL;
             const method = editId ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
                 method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: formData
             });
 
             if (response.ok) {
@@ -394,6 +403,14 @@
         }).join('');
     }
 
+    let selectedFile = null;
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        selectedFile = file;
+        document.getElementById('fileLabel').textContent = file.name;
+    }
+
     const itemModal = document.getElementById('itemModal');
 
     document.getElementById('addBtn').addEventListener('click', () => {
@@ -403,7 +420,8 @@
         document.getElementById('fCategory').value = "main";
         document.getElementById('fPrice').value = "";
         document.getElementById('fDesc').value = "";
-        document.getElementById('fImageUrl').value = "";
+        selectedFile = null;
+        document.getElementById('fileLabel').textContent = "Tap to select photo from local files";
         document.getElementById('formErr').textContent = "";
         itemModal.showModal();
     });
@@ -422,7 +440,8 @@
         document.getElementById('fCategory').value = catKey;
         document.getElementById('fPrice').value = item.price;
         document.getElementById('fDesc').value = item.description || '';
-        document.getElementById('fImageUrl').value = item.imageUrl || '';
+        selectedFile = null;
+        document.getElementById('fileLabel').textContent = "Keep existing or choose new file...";
         document.getElementById('formErr').textContent = "";
         itemModal.showModal();
     };
@@ -440,7 +459,6 @@
         const categoryKey = document.getElementById('fCategory').value;
         const price = document.getElementById('fPrice').value;
         const description = document.getElementById('fDesc').value.trim();
-        const imageUrl = document.getElementById('fImageUrl').value.trim();
         const editId = document.getElementById('editId').value;
         const err = document.getElementById('formErr');
 
@@ -451,17 +469,16 @@
 
         const categoryId = categoryMap[categoryKey] || 3;
 
-        const payload = {
-            name: name,
-            description: description,
-            price: parseFloat(price),
-            imageUrl: imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
-            category: { id: categoryId },
-            available: true,
-            featured: false
-        };
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("description", description);
+        formData.append("price", price);
+        formData.append("categoryId", categoryId);
+        if (selectedFile) {
+            formData.append("image", selectedFile);
+        }
 
-        saveItem(payload, editId);
+        saveItem(formData, editId);
         itemModal.close();
     });
 
