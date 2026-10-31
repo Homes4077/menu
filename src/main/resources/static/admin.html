@@ -146,13 +146,6 @@
         .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,182,39,.2)}
         .err{color:#ff8e82;font-size:.8rem;margin-bottom:10px;font-weight:500}
 
-        .file-upload-box {
-            border: 2px dashed var(--line); border-radius: 14px; padding: 14px; text-align: center;
-            background: rgba(255,255,255,0.02); cursor: pointer; position: relative; margin-top: 4px;
-        }
-        .file-upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-        .file-upload-box span { font-size: 0.8rem; color: var(--muted); }
-
         .modal-btns{display:flex;gap:10px;margin-top:16px}
         .btn-save{flex:1;background:linear-gradient(135deg, #ffc44d, var(--gold));color:#140f02;font-weight:700;padding:13px;border-radius:14px;cursor:pointer}
         .btn-cancel{background:rgba(255,255,255,0.05);color:var(--muted);border:1px solid var(--line);padding:13px 20px;border-radius:14px;font-weight:600;cursor:pointer}
@@ -222,14 +215,7 @@
     </div>
     <div class="field">
         <label for="fCategory">Category</label>
-        <select id="fCategory">
-            <option value="morning">Morning Feasts</option>
-            <option value="starter">Starters</option>
-            <option value="main">Gourmet Mains</option>
-            <option value="dessert">Sweet Desserts</option>
-            <option value="soft drinks">Soft Beverages</option>
-            <option value="liquour">Cellar Liquor</option>
-        </select>
+        <select id="fCategory"></select>
     </div>
     <div class="field">
         <label for="fPrice">Price (Ksh)</label>
@@ -240,11 +226,8 @@
         <textarea id="fDesc" rows="2" placeholder="Brief appetizing description..."></textarea>
     </div>
     <div class="field">
-        <label>Upload Image from Local Device</label>
-        <div class="file-upload-box">
-            <span id="fileLabel">Tap to select photo from local files</span>
-            <input type="file" id="fFile" accept="image/*" onchange="handleFileSelect(event)">
-        </div>
+        <label for="fImageUrl">Dish Image URL (e.g. Unsplash link)</label>
+        <input id="fImageUrl" type="url" placeholder="https://images.unsplash.com/photo-...">
     </div>
     <div class="err" id="formErr"></div>
     <div class="modal-btns">
@@ -316,15 +299,23 @@
     // --- BACKEND API INTEGRATION ---
     const API_URL = "/api/menu-items";
     let items = [];
+    let categories = [];
 
-    const categoryMap = {
-        "morning": 1,
-        "starter": 2,
-        "main": 3,
-        "dessert": 4,
-        "soft drinks": 5,
-        "liquour": 6
-    };
+    async function loadCategories() {
+        try {
+            const res = await fetch('/api/public/menu/paleo-hotel-spa');
+            if (res.ok) {
+                const data = await res.json();
+                if (data.categories) {
+                    categories = data.categories;
+                    const select = document.getElementById('fCategory');
+                    select.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+                }
+            }
+        } catch(e) {
+            console.error("Failed to load categories", e);
+        }
+    }
 
     async function loadItems() {
         try {
@@ -337,14 +328,15 @@
         renderList();
     }
 
-    async function saveItem(formData, editId) {
+    async function saveItem(payload, editId) {
         try {
             const url = editId ? `${API_URL}/${editId}` : API_URL;
             const method = editId ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
                 method: method,
-                body: formData
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
             });
 
             if (response.ok) {
@@ -376,7 +368,7 @@
         }
 
         list.innerHTML = items.map((item) => {
-            const catName = item.category ? item.category.name : 'main';
+            const catName = item.category ? item.category.name : 'Gourmet Mains';
             return `
                 <div class="item-card">
                     <img src="${item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'}" alt="${item.name}">
@@ -394,25 +386,18 @@
         }).join('');
     }
 
-    let selectedFile = null;
-    function handleFileSelect(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        selectedFile = file;
-        document.getElementById('fileLabel').textContent = file.name;
-    }
-
     const itemModal = document.getElementById('itemModal');
 
     document.getElementById('addBtn').addEventListener('click', () => {
         document.getElementById('modalTitle').textContent = "Add New Dish";
         document.getElementById('editId').value = "";
         document.getElementById('fName').value = "";
-        document.getElementById('fCategory').value = "main";
+        if (categories.length > 0) {
+            document.getElementById('fCategory').value = categories[0].id;
+        }
         document.getElementById('fPrice').value = "";
         document.getElementById('fDesc').value = "";
-        selectedFile = null;
-        document.getElementById('fileLabel').textContent = "Tap to select photo from local files";
+        document.getElementById('fImageUrl').value = "";
         document.getElementById('formErr').textContent = "";
         itemModal.showModal();
     });
@@ -423,11 +408,12 @@
         document.getElementById('modalTitle').textContent = "Edit Dish";
         document.getElementById('editId').value = item.id;
         document.getElementById('fName').value = item.name;
-        document.getElementById('fCategory').value = item.category ? item.category.name.toLowerCase() : 'main';
+        if (item.category && item.category.id) {
+            document.getElementById('fCategory').value = item.category.id;
+        }
         document.getElementById('fPrice').value = item.price;
         document.getElementById('fDesc').value = item.description || '';
-        selectedFile = null;
-        document.getElementById('fileLabel').textContent = "Keep existing or choose new file...";
+        document.getElementById('fImageUrl').value = item.imageUrl || '';
         document.getElementById('formErr').textContent = "";
         itemModal.showModal();
     };
@@ -442,9 +428,10 @@
 
     document.getElementById('modalSave').addEventListener('click', () => {
         const name = document.getElementById('fName').value.trim();
-        const categoryKey = document.getElementById('fCategory').value;
+        const categoryId = document.getElementById('fCategory').value;
         const price = document.getElementById('fPrice').value;
         const description = document.getElementById('fDesc').value.trim();
+        const imageUrl = document.getElementById('fImageUrl').value.trim();
         const editId = document.getElementById('editId').value;
         const err = document.getElementById('formErr');
 
@@ -453,23 +440,22 @@
             return;
         }
 
-        const categoryId = categoryMap[categoryKey] || 3;
+        const payload = {
+            name: name,
+            description: description,
+            price: Number(price),
+            imageUrl: imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80',
+            available: true,
+            featured: false,
+            category: { id: Number(categoryId) }
+        };
 
-        const formData = new FormData();
-        formData.append("name", name);
-        formData.append("description", description);
-        formData.append("price", price);
-        formData.append("categoryId", categoryId);
-        if (selectedFile) {
-            formData.append("image", selectedFile);
-        }
-
-        saveItem(formData, editId);
+        saveItem(payload, editId);
         itemModal.close();
     });
 
     // QR Code Handler
-    const qrModal = document.getElementById('qrModal');
+    const QRModal = document.getElementById('qrModal');
     const menuUrlInput = document.getElementById('menuUrl');
     const currentMenuLink = window.location.origin + window.location.pathname.replace('admin.html', 'index.html');
 
@@ -495,7 +481,7 @@
 
     document.getElementById('qrClose').addEventListener('click', () => qrModal.close());
 
-    loadItems();
+    loadCategories().then(() => loadItems());
 </script>
 </body>
 </html>
