@@ -44,7 +44,6 @@
         :focus-visible{outline:2px solid var(--gold);outline-offset:3px;border-radius:8px}
         button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
-        /* Masthead */
         .brand{padding:0 20px;display:flex;align-items:center;justify-content:space-between}
         .brand h1{
             font-family:'Fraunces',serif;font-weight:800;font-size:2.5rem;line-height:1;letter-spacing:-.03em;
@@ -73,7 +72,6 @@
             box-shadow: 0 4px 20px rgba(245, 238, 220, 0.25); transform: translateY(-1px);
         }
 
-        /* Plate Wheel */
         .stage{position:relative;height:calc(var(--p)*1.35);margin-top:5px}
         .ring{position:absolute;left:50%;top:50%;width:calc(var(--p)*1.36);height:calc(var(--p)*1.36);margin:calc(var(--p)*-.68) 0 0 calc(var(--p)*-.68);pointer-events:none;will-change:transform;transition:transform 0.4s cubic-bezier(.2,1,.3,1)}
         .ring text{font-family:'Fraunces',serif;font-size:18px;font-style:italic;fill:var(--gold);opacity:.85;letter-spacing:2px}
@@ -95,7 +93,6 @@
         }
         .slide img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;background:var(--lagoon)}
 
-        /* Dish details */
         .info{padding:8px 20px 0;text-align:center;min-height:200px}
         .info.in{animation:swap .4s cubic-bezier(.16,1,.3,1) both}
         @keyframes swap{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
@@ -121,7 +118,6 @@
         .nav button:not(:disabled):active{background:var(--line)}
         .nav button:disabled{opacity:.2;cursor:default}
 
-        /* Order Tray */
         .tray{
             position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));
             transform:translate(-50%,180%);width:min(calc(100% - 24px),448px);
@@ -132,22 +128,6 @@
         }
         .tray.show{transform:translate(-50%,0)}
         .tray small{font-weight:600;opacity:.7;display:block;font-size:.74rem;margin-top:1px}
-
-        /* Dialog & Dropdown Visibility Fix */
-        select, .field select {
-            background-color: #112224 !important;
-            color: var(--bone) !important;
-            border: 1px solid var(--line);
-        }
-        select option {
-            background-color: #112224 !important;
-            color: var(--bone) !important;
-            padding: 12px;
-        }
-        select option:hover, select option:focus, select option:checked {
-            background-color: var(--gold) !important;
-            color: #140f02 !important;
-        }
 
         dialog{
             margin:auto auto 0;width:100%;max-width:480px;max-height:85dvh;overflow-y:auto;border:0;
@@ -178,14 +158,7 @@
         <a href="admin.html" class="admin-link">Admin Console</a>
     </header>
 
-    <nav class="tabs" role="tablist" aria-label="Menu sections">
-        <button class="tab" role="tab" data-view="morning" aria-selected="true">Morning</button>
-        <button class="tab" role="tab" data-view="starter" aria-selected="false">Starters</button>
-        <button class="tab" role="tab" data-view="main" aria-selected="false">Mains</button>
-        <button class="tab" role="tab" data-view="dessert" aria-selected="false">Desserts</button>
-        <button class="tab" role="tab" data-view="soft drinks" aria-selected="false">Soft Drinks</button>
-        <button class="tab" role="tab" data-view="liquour" aria-selected="false">Liquor</button>
-    </nav>
+    <nav class="tabs" id="tabsNav" role="tablist" aria-label="Menu sections"></nav>
 
     <main id="menuView">
         <div class="stage">
@@ -221,19 +194,11 @@
 </dialog>
 
 <script>
-    let MENU = {
-        morning: { title: "morning feasts", items: [] },
-        starter: { title: "starters", items: [] },
-        main: { title: "gourmet mains", items: [] },
-        dessert: { title: "sweet desserts", items: [] },
-        "soft drinks": { title: "soft beverages", items: [] },
-        liquour: { title: "cellar liquor", items: [] }
-    };
-
+    let MENU = {};
     const $ = (id) => document.getElementById(id);
     const ksh = (n) => "Ksh " + Number(n).toLocaleString("en-KE");
     const cart = {};
-    let cat = "morning", idx = 0, items = [];
+    let cat = "", idx = 0, items = [];
 
     const track = $("track"), ring = $("ring"), ringText = $("ringText");
 
@@ -245,55 +210,55 @@
             const response = await fetch('/api/public/menu/paleo-hotel-spa');
             if (response.ok) {
                 const data = await response.json();
-                const structured = {
-                    morning: { title: "morning feasts", items: [] },
-                    starter: { title: "starters", items: [] },
-                    main: { title: "gourmet mains", items: [] },
-                    dessert: { title: "sweet desserts", items: [] },
-                    "soft drinks": { title: "soft beverages", items: [] },
-                    liquour: { title: "cellar liquor", items: [] }
-                };
+                const structured = {};
 
-                if (data.categories) {
+                if (data.categories && data.categories.length > 0) {
                     data.categories.forEach(category => {
-                        let cKey = category.name.toLowerCase().trim();
-                        if (cKey.includes('morning')) cKey = 'morning';
-                        else if (cKey.includes('starter')) cKey = 'starter';
-                        else if (cKey.includes('main')) cKey = 'main';
-                        else if (cKey.includes('dessert')) cKey = 'dessert';
-                        else if (cKey.includes('drink')) cKey = 'soft drinks';
-                        else if (cKey.includes('liquor')) cKey = 'liquour';
-
-                        if (!structured[cKey]) {
-                            structured[cKey] = { title: category.name, items: [] };
-                        }
-
-                        if (category.items) {
-                            category.items.forEach(item => {
-                                structured[cKey].items.push({
-                                    id: item.id,
-                                    name: item.name,
-                                    desc: item.description || '',
-                                    price: Number(item.price),
-                                    img: item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'
-                                });
-                            });
-                        }
+                        const keyName = category.name.toLowerCase().trim();
+                        structured[keyName] = {
+                            title: category.name,
+                            items: (category.items || []).map(item => ({
+                                id: item.id,
+                                name: item.name,
+                                desc: item.description || '',
+                                price: Number(item.price),
+                                img: item.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=600&q=80'
+                            }))
+                        };
                     });
+                    MENU = structured;
                 }
-                MENU = structured;
             }
         } catch(e) {
             console.warn("Could not fetch public menu from backend.", e);
         }
-        build(cat);
+
+        renderTabs();
+        
+        // Find the first category that actually has items to display, or default to the first available category
+        const availableKeys = Object.keys(MENU);
+        const activeKey = availableKeys.find(k => MENU[k].items.length > 0) || availableKeys[0] || "mains";
+        show(activeKey);
+    }
+
+    function renderTabs() {
+        const tabsNav = $("tabsNav");
+        const keys = Object.keys(MENU);
+        if (keys.length === 0) return;
+
+        tabsNav.innerHTML = keys.map((k, i) => `
+            <button class="tab" role="tab" data-view="${k}" aria-selected="${i === 0}">
+                ${MENU[k].title}
+            </button>
+        `).join('');
     }
 
     function show(view) {
+        cat = view;
         document.querySelectorAll(".tab").forEach(t => {
-            t.setAttribute("aria-selected", t.dataset.view === view ? "true" : "false");
+            t.setAttribute("aria-selected", t.dataset.view === cat ? "true" : "false");
         });
-        build(view);
+        build(cat);
     }
 
     function build(category) {
@@ -405,7 +370,7 @@
     $("prev").addEventListener('click', () => { if (idx > 0) { idx--; scrollToSlide(idx); } });
     $("next").addEventListener('click', () => { if (idx < items.length - 1) { idx++; scrollToSlide(idx); } });
 
-    document.querySelector(".tabs").addEventListener('click', (e) => {
+    $("tabsNav").addEventListener('click', (e) => {
         const tab = e.target.closest(".tab");
         if (tab) {
             show(tab.dataset.view);
