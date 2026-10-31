@@ -5,6 +5,7 @@ import com.digitalmenu.digital_menu.model.MenuItem;
 import com.digitalmenu.digital_menu.repository.CategoryRepository;
 import com.digitalmenu.digital_menu.repository.MenuItemRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +15,7 @@ import java.util.Base64;
 @RestController
 @RequestMapping("/api/menu-items")
 @CrossOrigin(origins = "*")
+@Transactional // Keeps the database session open for lazy-loaded relationships during JSON serialization
 public class MenuItemController {
 
     private final MenuItemRepository menuItemRepository;
