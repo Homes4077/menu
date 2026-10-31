@@ -4,7 +4,6 @@ import com.digitalmenu.digital_menu.entity.Business;
 import com.digitalmenu.digital_menu.entity.Category;
 import com.digitalmenu.digital_menu.repository.BusinessRepository;
 import com.digitalmenu.digital_menu.repository.CategoryRepository;
-import com.digitalmenu.digital_menu.repository.MenuItemRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,9 +17,8 @@ public class DataInitializer {
     @Bean
     @Transactional
     public CommandLineRunner initializeCategories(BusinessRepository businessRepository,
-                                                  CategoryRepository categoryRepository,
-                                                  MenuItemRepository menuItemRepository) {
-        return args -> {
+                                                  CategoryRepository categoryRepository) {
+        return argsString -> {
             String slug = "paleo-hotel-spa";
             Business business = businessRepository.findBySlug(slug).orElseGet(() -> {
                 Business newBusiness = new Business();
@@ -32,34 +30,35 @@ public class DataInitializer {
                 return businessRepository.save(newBusiness);
             });
 
-            // Clean reset of categories if old/unwanted ones like "Gourmet Mains" exist
-            List<Category> existingCategories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
-            boolean hasOldCategories = existingCategories.stream().anyMatch(c -> c.getName().equalsIgnoreCase("Gourmet Mains"));
+            // The exact 6 active categories required
+            List<String> requiredCategories = List.of(
+                    "Morning", 
+                    "Starters", 
+                    "Day's Specials", 
+                    "Desserts", 
+                    "Soft Drinks", 
+                    "Liquor (18+)"
+            );
 
-            if (hasOldCategories || existingCategories.size() != 6) {
-                System.out.println("[DataInitializer] Resetting categories to match the exact 6 required layout...");
-                // Note: If menu items reference these categories, you may need to unassign them first or let cascade handle it.
-                categoryRepository.deleteAll(existingCategories);
-                
-                List<String> requiredCategories = List.of(
-                        "Morning", 
-                        "Starters", 
-                        "Day's Specials", 
-                        "Desserts", 
-                        "Soft Drinks", 
-                        "Liquor (18+)"
-                );
+            List<Category> currentCategories = categoryRepository.findByBusinessIdAndActiveTrueOrderByDisplayOrderAsc(business.getId());
 
-                int order = 1;
-                for (String catName : requiredCategories) {
-                    Category category = new Category();
+            int order = 1;
+            for (String catName : requiredCategories) {
+                Category category = currentCategories.stream()
+                        .filter(c -> c.getName().equalsIgnoreCase(catName))
+                        .findFirst()
+                        .orElse(null);
+
+                if (category == null) {
+                    category = new Category();
                     category.setName(catName);
                     category.setDescription("Freshly prepared " + catName.toLowerCase());
                     category.setBusiness(business);
                     category.setActive(true);
-                    category.setDisplayOrder(order++);
-                    categoryRepository.save(category);
                 }
+                
+                category.setDisplayOrder(order++);
+                categoryRepository.save(category);
             }
 
             // Verification log
