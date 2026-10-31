@@ -31,6 +31,8 @@ public class MenuItemController {
             @RequestParam("categoryId") Long categoryId,
             @RequestParam(value = "image", required = false) MultipartFile image) {
         try {
+            System.out.println("[API] Saving new dish: " + name + " under category ID: " + categoryId);
+
             MenuItem item = new MenuItem();
             item.setName(name);
             item.setDescription(description != null ? description : "");
@@ -48,6 +50,7 @@ public class MenuItemController {
             }
 
             MenuItem savedItem = menuItemRepository.save(item);
+            System.out.println("[API] Successfully saved dish ID: " + savedItem.getId());
             return ResponseEntity.ok(savedItem);
         } catch (Exception e) {
             e.printStackTrace();
@@ -64,6 +67,8 @@ public class MenuItemController {
             @RequestParam("categoryId") Long categoryId,
             @RequestParam(value = "image", required = false) MultipartFile image) {
         try {
+            System.out.println("[API] Updating dish ID: " + id);
+
             MenuItem item = menuItemRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Item not found"));
 
