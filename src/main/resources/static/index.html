@@ -36,7 +36,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-
 .cat[aria-selected=true]{color:var(--bone)}
 .cat[aria-selected=true]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--a),var(--b))}
 
-.card{min-height:168px;margin-top:18px}
+.card{min-height:168px;margin-top:18px;cursor:pointer}
 .count{font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:650}
 .card h2{margin-top:8px;font:800 clamp(1.9rem,8vw,2.4rem)/1.02 'Bricolage Grotesque',sans-serif;font-stretch:80%;letter-spacing:-.02em}
 .desc{margin-top:8px;max-width:34ch;color:var(--muted);font-size:.95rem}
@@ -62,13 +62,17 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-
 .spot{position:absolute;width:200px;height:124px;margin:-62px 0 0 -100px;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--ar),.3),rgba(var(--ar),0));pointer-events:none}
 .hub{position:absolute;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;border:1px dashed rgba(246,240,225,.16);pointer-events:none}
 .pile{position:absolute;width:0;height:0;z-index:60;pointer-events:none}
-.m{position:absolute;left:0;top:0;width:46px;height:46px;border-radius:50%;background:var(--panel2);box-shadow:0 0 0 2px var(--c),0 10px 18px -8px #000}
-.plate{position:absolute;left:0;top:0;width:64px;height:64px;margin:0;padding:0;border:0;border-radius:50%;background:var(--panel2);box-shadow:0 0 0 2px var(--c),0 14px 22px -12px #000;will-change:transform,opacity}
-.plate.front{box-shadow:0 0 0 3px var(--bone),0 0 30px -3px var(--c),0 16px 26px -12px #000}
+.m{position:absolute;left:0;top:0;width:52px;height:52px;border-radius:50%;background:var(--panel2);box-shadow:0 0 0 2px var(--c),0 10px 18px -8px #000}
+.plate{position:absolute;left:0;top:0;width:96px;height:96px;margin:0;padding:0;border:0;border-radius:50%;background:var(--panel2);box-shadow:0 0 0 2px var(--c),0 14px 22px -12px #000;will-change:transform,opacity}
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+.plate.front{box-shadow:0 0 0 4px var(--bone),0 0 40px -2px var(--c),0 20px 32px -10px #000;animation:pulseGlow 3s ease-in-out infinite}
 .face{position:absolute;top:0;right:0;bottom:0;left:0;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--c),var(--d))}
-.ltr{position:absolute;top:0;right:0;bottom:0;left:0;display:grid;place-items:center;font:800 1.7rem/1 'Bricolage Grotesque',sans-serif;color:rgba(7,17,19,.8)}
+.ltr{position:absolute;top:0;right:0;bottom:0;left:0;display:grid;place-items:center;font:800 2.2rem/1 'Bricolage Grotesque',sans-serif;color:rgba(7,17,19,.8)}
 .face img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
-.qty{position:absolute;right:-6px;top:-6px;display:none;min-width:24px;height:24px;padding:0 6px;border-radius:8px;background:var(--bone);color:var(--dark);font-weight:800;font-size:.8rem;line-height:24px;text-align:center}
+.qty{position:absolute;right:-2px;top:-2px;display:none;min-width:28px;height:28px;padding:0 8px;border-radius:10px;background:var(--bone);color:var(--dark);font-weight:800;font-size:.85rem;line-height:28px;text-align:center}
 .plate.on .qty{display:block}
 .fly{position:fixed;z-index:200;margin:0;padding:0;border:0;border-radius:50%;background:var(--panel2);box-shadow:0 0 0 2px var(--c),0 14px 22px -12px #000;pointer-events:none;will-change:transform,opacity}
 
@@ -149,7 +153,7 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
 
   <div id="menuUI" hidden>
     <nav class="cats" id="cats" role="tablist" aria-label="Menu sections"></nav>
-    <article class="card" id="card" aria-live="polite">
+    <article class="card" id="card" aria-live="polite" title="Tap to inspect dish">
       <p class="count" id="count"></p>
       <h2 id="dName"></h2>
       <p class="desc" id="dDesc"></p>
@@ -191,10 +195,24 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
   <button type="button" class="dismiss" data-close>Keep browsing</button>
 </dialog>
 
+<!-- Dish Inspector Modal -->
+<dialog id="dishModal" aria-labelledby="modalTitle">
+  <div class="modal-content" style="text-align:center;">
+    <div id="modalImageContainer" style="width:140px;height:140px;margin:0 auto 16px;border-radius:50%;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.5);position:relative;"></div>
+    <h3 id="modalTitle" style="font:800 1.6rem 'Bricolage Grotesque'; margin-bottom:8px;"></h3>
+    <p id="modalDesc" style="color:var(--muted); margin-bottom:16px; font-size:0.95rem;"></p>
+    <p id="modalPrice" style="color:var(--a); font-weight:800; font-size:1.3rem; margin-bottom:20px;"></p>
+    <div style="display:flex; gap:12px; justify-content:center; flex-direction:column;">
+      <button type="button" class="dismiss" id="modalAddBtn" style="background:linear-gradient(135deg,var(--a),var(--b)); color:var(--dark); margin-top:0;">Add to Table</button>
+      <button type="button" class="dismiss" data-close-modal style="margin-top:0;">Close</button>
+    </div>
+  </div>
+</dialog>
+
 <script>
 (function () {
   'use strict';
-  var TAU = Math.PI * 2, S = 64, TILT = 0.5, DRAG_K = 3.2, MAX_FLING = 9;
+  var TAU = Math.PI * 2, S = 96, TILT = 0.5, DRAG_K = 3.2, MAX_FLING = 9;
   var SVGNS = 'http://www.w3.org/2000/svg';
   var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var $ = function (id) { return document.getElementById(id); };
@@ -225,12 +243,9 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
   try { cart = new Map(JSON.parse(sessionStorage.getItem('paleo_order_v4') || '[]')); } catch (e) { cart = new Map(); }
   function saveCart() { try { sessionStorage.setItem('paleo_order_v4', JSON.stringify(Array.from(cart))); } catch (e) {} }
 
-  /* T.front = local index of the dish at the front of the current page.
-     T.gFront = index of that dish in the whole section. T.goal = section index being spun to. */
   var T = {plates: [], seams: [], ang: 0, omega: 0, target: null, goal: -1, drag: null, raf: 0, last: 0,
-           front: -1, gFront: -1, page: 0, perPage: 9, cx: 160, cy: 90, R0: 120, Ry0: 60, DX: 160, DY: 100};
+           front: -1, gFront: -1, page: 0, perPage: 8, cx: 160, cy: 90, R0: 130, Ry0: 65, DX: 170, DY: 110};
 
-  /* ---------- data ---------- */
   function norm(raw, catKey) {
     var img = String(raw.imageUrl || raw.image_url || raw.imagePath || raw.image || raw.img || '').trim();
     if (img && !/^(https?:|data:|blob:|\/)/i.test(img)) img = '/' + img;
@@ -356,17 +371,16 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     buildPlates();
   }
 
-  /* ---------- geometry ---------- */
   function geometry() {
     var table = $('table');
     var W = table.clientWidth || 340;
     T.cx = W / 2;
-    T.R0 = clamp(W / 2 - 52, 96, 150);
+    T.R0 = clamp(W / 2 - 58, 100, 160);
     T.Ry0 = T.R0 * TILT;
-    T.DX = T.R0 + 40;
-    T.DY = T.Ry0 + 40;
-    T.perPage = Math.max(3, Math.floor(TAU * T.R0 / (S * 1.12 + 12)));
-    var H = 2 * T.Ry0 + S * 1.12 + 26;
+    T.DX = T.R0 + 44;
+    T.DY = T.Ry0 + 44;
+    T.perPage = Math.max(3, Math.floor(TAU * T.R0 / (S * 1.15 + 10)));
+    var H = 2 * T.Ry0 + S * 1.15 + 32;
     T.cy = H / 2;
     table.style.height = H + 'px';
     var d = $('disc'), sv = $('seams');
@@ -394,7 +408,6 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
       '</span>';
   }
 
-  /* One ring per page. A page holds as many dishes as fit at full size around the table. */
   function buildPlates() {
     var table = $('table');
     T.plates.forEach(function (p) { p.el.remove(); });
@@ -433,7 +446,6 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     }
   }
 
-  /* ---------- drawing ---------- */
   function render() {
     var n = T.plates.length;
     if (!n) return;
@@ -445,7 +457,7 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
       x = T.cx + T.R0 * Math.sin(th);
       y = T.cy + T.R0 * TILT * v;
       t = (v + 1) / 2;
-      s = 0.66 + 0.46 * t;
+      s = 0.68 + 0.42 * t;
       p.el.style.transform = 'translate3d(' + (x - S / 2).toFixed(2) + 'px,' + (y - S / 2).toFixed(2) + 'px,0) scale(' + s.toFixed(3) + ')';
       p.el.style.opacity = (0.4 + 0.6 * t).toFixed(3);
       p.el.style.zIndex = String(10 + Math.round(t * 60));
@@ -552,7 +564,7 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     ghost.innerHTML = faceHTML(p.item);
     document.body.appendChild(ghost);
     var cx = from.left + from.width / 2, cy = from.top + from.height / 2;
-    var k = 46 / from.width;
+    var k = 52 / from.width;
     var a = ghost.animate([
       {transform: 'translate(0,0) scale(1)', opacity: 1},
       {transform: 'translate(' + (pile.left - cx) + 'px,' + (pile.top - cy) + 'px) scale(' + k + ')', opacity: 0.1}
@@ -567,7 +579,6 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     setQty(p.item.key, 1);
   }
 
-  /* ---------- physics ---------- */
   function focusAngle(j) { return T.ang - wrap(T.ang + T.plates[j].a); }
 
   function snapAngle() {
@@ -616,7 +627,6 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     return Math.atan2(dx, dy);
   }
 
-  /* spin to a dish on the current page (j = local index) */
   function goToLocal(j) {
     T.omega = 0;
     T.goal = T.page * T.perPage + j;
@@ -624,7 +634,6 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     kick();
   }
 
-  /* spin to any dish in the section (g = section index), switching page when needed */
   function goToGlobal(g) {
     var c = MENU[cat];
     if (!c) return;
@@ -646,7 +655,6 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     goToGlobal(base + dir);
   }
 
-  /* ---------- table input ---------- */
   var table = $('table');
   table.addEventListener('pointerdown', function (e) {
     if (!T.plates.length || (e.button != null && e.button !== 0)) return;
@@ -696,7 +704,6 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectFront(); }
   });
 
-  /* ---------- controls ---------- */
   $('prev').addEventListener('click', function () { step(-1); });
   $('next').addEventListener('click', function () { step(1); });
 
@@ -712,6 +719,24 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     else setQty(b.dataset.key, b.dataset.act === 'dec' ? -1 : 1);
   });
 
+  // Card click opens detail lightbox modal
+  $('card').addEventListener('click', function (e) {
+    if (e.target.closest('button')) return;
+    var c = MENU[cat];
+    if (!c || T.gFront < 0) return;
+    var it = c.items[T.gFront];
+    $('modalTitle').textContent = it.name;
+    $('modalDesc').textContent = it.desc;
+    $('modalPrice').textContent = ksh(it.price);
+    $('modalImageContainer').innerHTML = faceHTML(it);
+    $('dishModal').showModal();
+  });
+
+  $('modalAddBtn').addEventListener('click', function () {
+    selectFront();
+    $('dishModal').close();
+  });
+
   $('lines').addEventListener('click', function (e) {
     var b = e.target.closest('[data-act]');
     if (b) setQty(b.dataset.key, b.dataset.act === 'dec' ? -1 : 1);
@@ -723,10 +748,15 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     if (e.target.closest('[data-clear]')) { cart.clear(); saveCart(); paintAll(); $('sheet').close(); }
     else if (e.target.closest('[data-close]')) { $('sheet').close(); }
     else if (e.target.closest('[data-retry]')) { SIG = ''; load(); }
+    else if (e.target.matches('[data-close-modal]')) { $('dishModal').close(); }
   });
 
   $('sheet').addEventListener('click', function (e) {
     if (e.target === $('sheet')) $('sheet').close();
+  });
+
+  $('dishModal').addEventListener('click', function (e) {
+    if (e.target === $('dishModal')) $('dishModal').close();
   });
 
   window.addEventListener('resize', function () {
