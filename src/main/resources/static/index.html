@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Paleo Hotel &amp; Spa: Menu</title>
-<meta name="description" content="Browse the Paleo Hotel &amp; Spa menu and set your table before you order.">
+<meta name="description" content="Spin the table to find a dish, then put it on your table before you order.">
 <meta name="theme-color" content="#071113">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
@@ -12,10 +12,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#071113;--panel:#0d1c1e;--panel2:#152b2e;--bone:#f6f0e1;--muted:#9db1a9;--line:rgba(246,240,225,.12);--dark:#071113;--a:#ffb627;--b:#ff6b3d;--ar:255,182,39;--S:76px;color-scheme:dark}
+:root{--ink:#071113;--panel:#0d1c1e;--panel2:#152b2e;--bone:#f6f0e1;--muted:#9db1a9;--line:rgba(246,240,225,.12);--dark:#071113;--a:#ffb627;--b:#ff6b3d;--ar:255,182,39;color-scheme:dark}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{background:var(--ink);-webkit-text-size-adjust:100%;text-size-adjust:100%}
-body{min-height:100vh;color:var(--bone);font:400 16px/1.5 'Bricolage Grotesque',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--ink);overflow-x:clip}
+body{min-height:100vh;color:var(--bone);font:400 16px/1.5 'Bricolage Grotesque',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--ink);overflow-x:hidden}
 @supports (min-height:100dvh){body{min-height:100dvh}}
 body::before{content:"";position:fixed;top:0;right:0;bottom:0;left:0;z-index:0;pointer-events:none;background:radial-gradient(110% 46% at 50% -4%,rgba(var(--ar),.22),rgba(var(--ar),0) 70%)}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
@@ -23,55 +23,67 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-
 [hidden]{display:none!important}
 
 .app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 18px calc(130px + env(safe-area-inset-bottom))}
-
 .top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
 .wordmark{font:800 clamp(3rem,15vw,3.9rem)/.9 'Bricolage Grotesque',sans-serif;font-stretch:75%;letter-spacing:-.03em}
 .ring{display:inline-block;box-sizing:border-box;width:.5em;height:.5em;margin-left:.06em;border:.13em solid var(--a);border-radius:50%}
 .meta{color:var(--a);font-weight:700;font-size:.95rem;white-space:nowrap}
 .lead{margin-top:10px;color:var(--muted);font-size:.92rem}
 
-.cats{display:flex;gap:20px;margin-top:18px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch}
+.cats{display:flex;gap:20px;margin-top:16px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--line);-webkit-overflow-scrolling:touch}
 .cats::-webkit-scrollbar{display:none}
 .cat{flex:none;position:relative;min-height:44px;padding:10px 0 12px;color:var(--muted);font-weight:650;font-size:.95rem;white-space:nowrap}
 .cat i{display:inline-block;width:8px;height:8px;margin-right:8px;border-radius:50%;background:var(--c);vertical-align:middle}
 .cat[aria-selected=true]{color:var(--bone)}
 .cat[aria-selected=true]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--a),var(--b))}
 
-.card{min-height:176px;margin-top:20px}
+.card{min-height:168px;margin-top:18px}
 .count{font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:650}
-.card h2{margin-top:8px;font:800 clamp(1.9rem,8vw,2.4rem)/1.02 'Bricolage Grotesque',sans-serif;font-stretch:80%;letter-spacing:-.02em;text-wrap:balance}
+.card h2{margin-top:8px;font:800 clamp(1.9rem,8vw,2.4rem)/1.02 'Bricolage Grotesque',sans-serif;font-stretch:80%;letter-spacing:-.02em}
 .desc{margin-top:8px;max-width:34ch;color:var(--muted);font-size:.95rem}
 .buy{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
 .price{font-weight:800;font-size:1.3rem;color:var(--a);font-variant-numeric:tabular-nums}
-.add{height:48px;padding:0 22px;border-radius:14px;background:linear-gradient(135deg,var(--a),var(--b));color:var(--dark);font-weight:800;font-size:.95rem}
+.add{height:48px;padding:0 24px;border-radius:14px;background:linear-gradient(135deg,var(--a),var(--b));color:var(--dark);font-weight:800;font-size:.95rem}
 .add:active,.step button:active,.arrow:active{transform:scale(.95)}
 .step{display:inline-flex;align-items:center;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--a),var(--b));color:var(--dark)}
 .step button{width:48px;height:48px;font-size:1.45rem;font-weight:800}
 .step b{min-width:30px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums}
+.swap>*{animation:rise .3s cubic-bezier(.2,.8,.2,1) both}
+.swap>*:nth-child(2){animation-delay:.03s}
+.swap>*:nth-child(3){animation-delay:.06s}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
-.arc{position:relative;height:204px;margin:4px -18px 0;overflow:visible;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab;outline:none}
-.arc.drag{cursor:grabbing}
-.arc:focus-visible{outline:2px solid var(--bone);outline-offset:-4px;border-radius:0}
-.plate{position:absolute;left:0;top:0;display:block;width:var(--S);height:var(--S);margin:0;padding:0;border:0;border-radius:50%;background:var(--panel2);box-shadow:0 0 0 2px var(--c),0 12px 24px -12px #000;will-change:transform,opacity}
-.plate.cur{box-shadow:0 0 0 3px var(--bone),0 0 30px -2px var(--c),0 14px 26px -12px #000}
+.table{position:relative;margin:6px -18px 0;touch-action:none;-webkit-user-select:none;user-select:none;cursor:grab;outline:none}
+.table.drag{cursor:grabbing}
+.table:focus-visible{outline:2px solid var(--bone);outline-offset:-4px;border-radius:24px}
+.disc{position:absolute;border-radius:50%;background:radial-gradient(closest-side,#183438 0%,#10262a 62%,#0a1a1d 100%);box-shadow:inset 0 0 0 2px rgba(var(--ar),.16),inset 0 0 0 3px rgba(246,240,225,.05),0 40px 70px -34px #000;pointer-events:none}
+.grooves{position:absolute;top:0;right:0;bottom:0;left:0;border-radius:50%;background:repeating-radial-gradient(closest-side,rgba(246,240,225,0) 0 30px,rgba(246,240,225,.04) 30px 31px);pointer-events:none}
+.seams{position:absolute;overflow:visible;pointer-events:none}
+.seams line{stroke:rgba(246,240,225,.085);stroke-width:1}
+.spot{position:absolute;width:200px;height:124px;margin:-62px 0 0 -100px;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--ar),.3),rgba(var(--ar),0));pointer-events:none}
+.hub{position:absolute;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;border:1px dashed rgba(246,240,225,.16);pointer-events:none}
+.pile{position:absolute;width:0;height:0;z-index:60;pointer-events:none}
+.m{position:absolute;left:0;top:0;width:46px;height:46px;border-radius:50%;background:var(--panel2);box-shadow:0 0 0 2px var(--c),0 10px 18px -8px #000}
+.plate{position:absolute;left:0;top:0;width:64px;height:64px;margin:0;padding:0;border:0;border-radius:50%;background:var(--panel2);box-shadow:0 0 0 2px var(--c),0 14px 22px -12px #000;will-change:transform,opacity}
+.plate.front{box-shadow:0 0 0 3px var(--bone),0 0 30px -3px var(--c),0 16px 26px -12px #000}
 .face{position:absolute;top:0;right:0;bottom:0;left:0;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--c),var(--d))}
-.face span{position:absolute;top:0;right:0;bottom:0;left:0;display:grid;place-items:center;font:800 1.9rem/1 'Bricolage Grotesque',sans-serif;color:rgba(7,17,19,.8)}
+.ltr{position:absolute;top:0;right:0;bottom:0;left:0;display:grid;place-items:center;font:800 1.7rem/1 'Bricolage Grotesque',sans-serif;color:rgba(7,17,19,.8)}
 .face img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;display:block}
-.qty{position:absolute;right:-6px;top:-6px;display:none;min-width:24px;height:24px;padding:0 6px;border-radius:8px;background:var(--bone);color:var(--dark);font-weight:800;font-size:.8rem;line-height:24px;text-align:center;font-variant-numeric:tabular-nums}
+.qty{position:absolute;right:-6px;top:-6px;display:none;min-width:24px;height:24px;padding:0 6px;border-radius:8px;background:var(--bone);color:var(--dark);font-weight:800;font-size:.8rem;line-height:24px;text-align:center}
 .plate.on .qty{display:block}
+.fly{position:fixed;z-index:200;margin:0;padding:0;border:0;border-radius:50%;background:var(--panel2);box-shadow:0 0 0 2px var(--c),0 14px 22px -12px #000;pointer-events:none;will-change:transform,opacity}
 
-.arcnav{display:flex;align-items:center;gap:12px;margin-top:8px}
+.arcnav{display:flex;align-items:center;gap:12px;margin-top:14px}
 .arrow{flex:none;width:44px;height:44px;border-radius:14px;border:1px solid var(--line);display:grid;place-items:center;color:var(--bone)}
-.arrow:disabled{opacity:.3}
 .prog{flex:1;height:3px;border-radius:2px;background:var(--line);overflow:hidden}
 .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));transition:width .25s ease}
+.hint{margin-top:8px;text-align:center;color:var(--muted);font-size:.8rem}
 
-.hint{margin-top:6px;text-align:center;color:var(--muted);font-size:.8rem}
-
-.skel{margin-top:24px;display:grid;gap:12px}
-.skel i{display:block;height:14px;border-radius:7px;background:linear-gradient(90deg,var(--panel2),rgba(246,240,225,.12),var(--panel2));background-size:200% 100%;animation:sh 1.4s linear infinite}
-.skel i:nth-child(1){width:60%;height:34px}.skel i:nth-child(2){width:88%}.skel i:nth-child(3){width:70%}
-.skel i:nth-child(4){height:200px;border-radius:50%;width:200px;margin:12px auto 0}
+.skel{margin-top:22px;display:grid;gap:12px;justify-items:center}
+.sk-line{display:block;width:100%;height:14px;border-radius:7px;background:linear-gradient(90deg,var(--panel2),rgba(246,240,225,.12),var(--panel2));background-size:200% 100%;animation:sh 1.4s linear infinite}
+.sk-line:nth-child(1){width:60%;height:34px}
+.sk-line:nth-child(2){width:88%}
+.sk-line:nth-child(3){width:70%}
+.sk-disc{display:block;width:200px;height:110px;margin-top:14px;border-radius:50%;background:linear-gradient(90deg,var(--panel2),rgba(246,240,225,.12),var(--panel2));background-size:200% 100%;animation:sh 1.4s linear infinite}
 @keyframes sh{from{background-position:200% 0}to{background-position:-200% 0}}
 
 .stage{padding:26px 0 10px;text-align:center}
@@ -118,10 +130,12 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     <h1 class="wordmark">Paleo<span class="ring" aria-hidden="true"></span></h1>
     <p class="meta">Hotel &amp; Spa</p>
   </header>
-  <p class="lead" id="lead">Turn the dial to find a dish, then tap Select.</p>
+  <p class="lead">Spin the table. Tap Select to add a dish.</p>
 
   <div id="loading">
-    <div class="skel" role="status" aria-label="Loading the menu"><i></i><i></i><i></i><i></i></div>
+    <div class="skel" role="status" aria-label="Loading the menu">
+      <i class="sk-line"></i><i class="sk-line"></i><i class="sk-line"></i><i class="sk-disc"></i>
+    </div>
   </div>
 
   <div id="empty" hidden>
@@ -135,17 +149,23 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
 
   <div id="menuUI" hidden>
     <nav class="cats" id="cats" role="tablist" aria-label="Menu sections"></nav>
-    <article class="card" aria-live="polite">
+    <article class="card" id="card" aria-live="polite">
       <p class="count" id="count"></p>
       <h2 id="dName"></h2>
       <p class="desc" id="dDesc"></p>
       <div class="buy"><span class="price" id="dPrice"></span><span id="ctl"></span></div>
     </article>
-    <div class="arc" id="arc" tabindex="0" role="group" aria-roledescription="carousel" aria-label="Dishes. Drag, tap or use arrow keys."></div>
     <div class="arcnav">
       <button type="button" class="arrow" id="prev" aria-label="Previous dish"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
       <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
       <button type="button" class="arrow" id="next" aria-label="Next dish"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+    <div class="table" id="table" tabindex="0" role="group" aria-roledescription="rotating table" aria-label="Dishes. Drag or flick to spin. Left and right arrow keys move one dish. Enter selects the dish at the front.">
+      <div class="disc" id="disc"><div class="grooves"></div></div>
+      <svg class="seams" id="seams" aria-hidden="true"></svg>
+      <div class="spot" id="spot" aria-hidden="true"></div>
+      <div class="hub" id="hub" aria-hidden="true"></div>
+      <div class="pile" id="pile" aria-hidden="true"></div>
     </div>
     <p class="hint">Prices are in Kenya shillings.</p>
   </div>
@@ -173,46 +193,54 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
 
 <script>
 (function () {
+  'use strict';
+  var TAU = Math.PI * 2, S = 64, TILT = 0.5, DRAG_K = 3.2, MAX_FLING = 9;
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  var reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var $ = function (id) { return document.getElementById(id); };
-  var ksh = function (n) { return 'Ksh ' + Number(n).toLocaleString('en-KE'); };
-  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   var clamp = function (v, lo, hi) { return Math.min(hi, Math.max(lo, v)); };
+  var wrap = function (a) { var r = (a + Math.PI) % TAU; if (r < 0) r += TAU; return r - Math.PI; };
+  var ksh = function (n) { return 'Ksh ' + Number(n).toLocaleString('en-KE'); };
+  var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]; }); };
   var rgb = function (h) { return [1, 3, 5].map(function (i) { return parseInt(h.substr(i, 2), 16); }).join(','); };
-
-  var S = 76, SP = 86, R = 340, TOP = 22;
-  var PALETTE = [['#ffb627','#ff6b3d'],['#c6f432','#19e3c1'],['#ff5a4e','#ff9f1c'],['#ff4fa3','#ff9f7a'],['#19e3c1','#38b6ff'],['#ffcf5c','#e63946']];
+  var PALETTE = [['#ffb627', '#ff6b3d'], ['#c6f432', '#19e3c1'], ['#ff5a4e', '#ff9f1c'], ['#ff4fa3', '#ff9f7a'], ['#19e3c1', '#38b6ff'], ['#ffcf5c', '#e63946']];
   var DEMO_ON = /[?&]demo(=|&|$)/.test(location.search);
   var DEMO = [
-    {category:'Morning feasts',id:1,name:'Coconut Pancake Stack',description:'Warm coconut pancakes with grilled mango and lime sugar.',price:950},
-    {category:'Morning feasts',id:2,name:'Mandazi and Chai Flight',description:'Cardamom mandazi with three small cups of spiced tea.',price:700},
-    {category:'Morning feasts',id:3,name:'Garden Omelette',description:'Three eggs, tomato, spring onion and fresh coriander.',price:850},
-    {category:'Starters',id:4,name:'Coconut Prawn Skewers',description:'Four skewers with a chilli and lime dip.',price:1450},
-    {category:'Starters',id:5,name:'Kachumbari Bowl',description:'Tomato, onion and chilli salad with avocado.',price:650},
-    {category:'Gourmet mains',id:6,name:'Pan-Seared Tilapia',description:'Lake tilapia with herb butter and garlic potatoes.',price:2400},
-    {category:'Gourmet mains',id:7,name:'Swahili Fish Curry',description:'Coconut curry with ginger, served with steamed rice.',price:2200},
-    {category:'Gourmet mains',id:8,name:'Nyama Choma Plate',description:'Charcoal-grilled goat with ugali and kachumbari.',price:2800},
-    {category:'Sweet desserts',id:9,name:'Mango Panna Cotta',description:'Vanilla cream set with fresh mango and passion fruit.',price:900},
-    {category:'Sweet desserts',id:10,name:'Warm Banana Fritters',description:'Honey, cinnamon and a scoop of vanilla ice cream.',price:800},
-    {category:'Soft beverages',id:11,name:'Fresh Passion Juice',description:'Pressed to order and served over ice.',price:450},
-    {category:'Soft beverages',id:12,name:'Dawa Mocktail',description:'Lime, honey and ginger over crushed ice.',price:650},
-    {category:'Cellar liquor',id:13,name:'Local Lager',description:'Cold bottle, 500 ml.',price:450}
+    {category: 'Morning feasts', id: 1, name: 'Coconut Pancake Stack', description: 'Warm coconut pancakes with grilled mango and lime sugar.', price: 950},
+    {category: 'Morning feasts', id: 2, name: 'Mandazi and Chai Flight', description: 'Cardamom mandazi with three small cups of spiced tea.', price: 700},
+    {category: 'Morning feasts', id: 3, name: 'Garden Omelette', description: 'Three eggs, tomato, spring onion and fresh coriander.', price: 850},
+    {category: 'Starters', id: 4, name: 'Coconut Prawn Skewers', description: 'Four skewers with a chilli and lime dip.', price: 1450},
+    {category: 'Starters', id: 5, name: 'Kachumbari Bowl', description: 'Tomato, onion and chilli salad with avocado.', price: 650},
+    {category: 'Gourmet mains', id: 6, name: 'Pan-Seared Tilapia', description: 'Lake tilapia with herb butter and garlic potatoes.', price: 2400},
+    {category: 'Gourmet mains', id: 7, name: 'Swahili Fish Curry', description: 'Coconut curry with ginger, served with steamed rice.', price: 2200},
+    {category: 'Gourmet mains', id: 8, name: 'Nyama Choma Plate', description: 'Charcoal-grilled goat with ugali and kachumbari.', price: 2800},
+    {category: 'Sweet desserts', id: 9, name: 'Mango Panna Cotta', description: 'Vanilla cream set with fresh mango and passion fruit.', price: 900},
+    {category: 'Sweet desserts', id: 10, name: 'Warm Banana Fritters', description: 'Honey, cinnamon and a scoop of vanilla ice cream.', price: 800},
+    {category: 'Soft beverages', id: 11, name: 'Fresh Passion Juice', description: 'Pressed to order and served over ice.', price: 450},
+    {category: 'Soft beverages', id: 12, name: 'Dawa Mocktail', description: 'Lime, honey and ginger over crushed ice.', price: 650},
+    {category: 'Cellar liquor', id: 13, name: 'Local Lager', description: 'Cold bottle, 500 ml.', price: 450}
   ];
 
-  var MENU = [], keyMap = new Map(), cat = 0, pos = 0, anim = 0, drag = null, plates = [], SIG = '', cart = new Map();
-  var curIdx = -1;
-  try { cart = new Map(JSON.parse(sessionStorage.getItem('paleo_cart_v3') || '[]')); } catch (e) { cart = new Map(); }
-  var saveCart = function () { try { sessionStorage.setItem('paleo_cart_v3', JSON.stringify(Array.from(cart))); } catch (e) {} };
+  var MENU = [], keyMap = new Map(), SIG = '', cat = 0, cart = new Map();
+  try { cart = new Map(JSON.parse(sessionStorage.getItem('paleo_order_v4') || '[]')); } catch (e) { cart = new Map(); }
+  function saveCart() { try { sessionStorage.setItem('paleo_order_v4', JSON.stringify(Array.from(cart))); } catch (e) {} }
 
-  function norm(it, catKey) {
-    var img = String(it.imageUrl || it.image_url || it.imagePath || it.image || it.img || '').trim();
+  /* T.front = local index of the dish at the front of the current page.
+     T.gFront = index of that dish in the whole section. T.goal = section index being spun to. */
+  var T = {plates: [], seams: [], ang: 0, omega: 0, target: null, goal: -1, drag: null, raf: 0, last: 0,
+           front: -1, gFront: -1, page: 0, perPage: 9, cx: 160, cy: 90, R0: 120, Ry0: 60, DX: 160, DY: 100};
+
+  /* ---------- data ---------- */
+  function norm(raw, catKey) {
+    var img = String(raw.imageUrl || raw.image_url || raw.imagePath || raw.image || raw.img || '').trim();
     if (img && !/^(https?:|data:|blob:|\/)/i.test(img)) img = '/' + img;
-    var id = it.id != null ? it.id : it.name;
+    var id = raw.id != null ? raw.id : raw.name;
+    var price = (raw.price === '' || raw.price == null) ? NaN : Number(raw.price);
     return {
       key: catKey + '|' + String(id),
-      id: String(id),
-      name: String(it.name || '').trim(),
-      desc: String(it.description != null ? it.description : (it.desc || '')).trim(),
-      price: Number(it.price),
+      name: String(raw.name || '').trim(),
+      desc: String(raw.description != null ? raw.description : (raw.desc || '')).trim(),
+      price: price,
       img: img
     };
   }
@@ -221,8 +249,7 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     if (!j) return null;
     var groups = new Map();
     var add = function (title, raw) {
-      var t = String(title || 'Menu').trim() || 'Menu';
-      var k = t.toLowerCase();
+      var t = String(title || 'Menu').trim() || 'Menu', k = t.toLowerCase();
       if (!groups.has(k)) groups.set(k, {key: k, title: t, raw: []});
       groups.get(k).raw.push(raw);
     };
@@ -235,33 +262,44 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     }
     var out = [];
     groups.forEach(function (g) {
-      var seen = new Set();
-      var items = g.raw.map(function (r) { return norm(r, g.key); }).filter(function (i) {
-        if (!i.name || !isFinite(i.price)) return false;
-        if (seen.has(i.key)) i.key += '~' + seen.size;
-        seen.add(i.key);
-        return true;
+      var seen = {}, items = [];
+      g.raw.forEach(function (r) {
+        var it = norm(r, g.key);
+        if (!it.name || !isFinite(it.price) || it.price < 0) return;
+        var k = it.key, n = 1;
+        while (seen[k]) { n++; k = it.key + '~' + n; }
+        seen[k] = true;
+        it.key = k;
+        items.push(it);
       });
       if (items.length) out.push({key: g.key, title: g.title, items: items});
     });
-    out.forEach(function (c, i) { c.colors = PALETTE[i % PALETTE.length]; });
+    out.forEach(function (c, i) {
+      c.colors = PALETTE[i % PALETTE.length];
+      c.items.forEach(function (it) { it.col = c.colors; });
+    });
     return out.length ? out : null;
   }
 
+  function demoMenu() {
+    var cats = [];
+    DEMO.forEach(function (d) {
+      var c = cats.filter(function (x) { return x.name === d.category; })[0];
+      if (!c) { c = {name: d.category, items: []}; cats.push(c); }
+      c.items.push(d);
+    });
+    return parse({categories: cats});
+  }
+
   async function getMenu() {
-    if (DEMO_ON) return parse({categories: DEMO.reduce(function (acc, it) {
-      var c = acc.filter(function (x) { return x.name === it.category; })[0];
-      if (!c) { c = {name: it.category, items: []}; acc.push(c); }
-      c.items.push(it);
-      return acc;
-    }, [])});
+    if (DEMO_ON) return demoMenu();
     var urls = ['/api/public/menu/paleo-hotel-spa', '/api/menu-items'];
     for (var u = 0; u < urls.length; u++) {
       try {
         var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null;
-        var t = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
+        var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
         var r = await fetch(urls[u], {headers: {Accept: 'application/json'}, signal: ctl ? ctl.signal : undefined});
-        clearTimeout(t);
+        clearTimeout(timer);
         if (r.ok && (r.headers.get('content-type') || '').indexOf('json') > -1) {
           var m = parse(await r.json());
           if (m) return m;
@@ -283,11 +321,19 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     MENU.forEach(function (c) { c.items.forEach(function (it) { keyMap.set(it.key, it); }); });
     Array.from(cart.keys()).forEach(function (k) { if (!keyMap.has(k)) cart.delete(k); });
     saveCart();
-    if (!MENU.length) { $('empty').hidden = false; $('menuUI').hidden = true; plates = []; $('tray').classList.remove('show'); return; }
-    $('empty').hidden = true; $('menuUI').hidden = false;
-    if (cat >= MENU.length) { cat = 0; pos = 0; }
+    if (!MENU.length) {
+      T.plates.forEach(function (p) { p.el.remove(); });
+      T.plates = [];
+      $('menuUI').hidden = true;
+      $('empty').hidden = false;
+      $('tray').classList.remove('show');
+      return;
+    }
+    $('empty').hidden = true;
+    $('menuUI').hidden = false;
+    if (cat >= MENU.length) cat = 0;
     buildTabs();
-    setCat(cat, true);
+    setCat(cat);
   }
 
   function buildTabs() {
@@ -296,95 +342,163 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     }).join('');
   }
 
-  function setCat(i, keepPos) {
+  function setCat(i) {
     cat = i;
-    if (!keepPos) pos = 0;
-    cancelAnimationFrame(anim);
-    var c = MENU[cat];
-    var root = document.documentElement.style;
-    root.setProperty('--a', c.colors[0]); root.setProperty('--b', c.colors[1]);
-    root.setProperty('--ar', rgb(c.colors[0]));
-    Array.prototype.forEach.call(document.querySelectorAll('.cat'), function (t) { t.setAttribute('aria-selected', String(+t.dataset.i === cat)); });
+    T.ang = 0; T.omega = 0; T.target = null; T.goal = -1; T.front = -1; T.gFront = -1; T.page = 0;
+    var c = MENU[cat], st = document.documentElement.style;
+    st.setProperty('--a', c.colors[0]);
+    st.setProperty('--b', c.colors[1]);
+    st.setProperty('--ar', rgb(c.colors[0]));
+    Array.prototype.forEach.call(document.querySelectorAll('.cat'), function (t) {
+      t.setAttribute('aria-selected', String(+t.dataset.i === cat));
+    });
+    geometry();
     buildPlates();
+  }
+
+  /* ---------- geometry ---------- */
+  function geometry() {
+    var table = $('table');
+    var W = table.clientWidth || 340;
+    T.cx = W / 2;
+    T.R0 = clamp(W / 2 - 52, 96, 150);
+    T.Ry0 = T.R0 * TILT;
+    T.DX = T.R0 + 40;
+    T.DY = T.Ry0 + 40;
+    T.perPage = Math.max(3, Math.floor(TAU * T.R0 / (S * 1.12 + 12)));
+    var H = 2 * T.Ry0 + S * 1.12 + 26;
+    T.cy = H / 2;
+    table.style.height = H + 'px';
+    var d = $('disc'), sv = $('seams');
+    d.style.left = (T.cx - T.DX) + 'px';
+    d.style.top = (T.cy - T.DY) + 'px';
+    d.style.width = (2 * T.DX) + 'px';
+    d.style.height = (2 * T.DY) + 'px';
+    sv.style.left = d.style.left;
+    sv.style.top = d.style.top;
+    sv.setAttribute('width', String(2 * T.DX));
+    sv.setAttribute('height', String(2 * T.DY));
+    sv.setAttribute('viewBox', '0 0 ' + (2 * T.DX) + ' ' + (2 * T.DY));
+    $('spot').style.left = T.cx + 'px';
+    $('spot').style.top = (T.cy + T.Ry0) + 'px';
+    $('hub').style.left = T.cx + 'px';
+    $('hub').style.top = T.cy + 'px';
+    $('pile').style.left = T.cx + 'px';
+    $('pile').style.top = T.cy + 'px';
+  }
+
+  function faceHTML(it) {
+    var letter = esc((it.name.charAt(0) || '?').toUpperCase());
+    return '<span class="face"><span class="ltr">' + letter + '</span>' +
+      (it.img ? '<img src="' + esc(it.img) + '" alt="" loading="lazy" decoding="async" onerror="this.style.display=\'none\'">' : '') +
+      '</span>';
+  }
+
+  /* One ring per page. A page holds as many dishes as fit at full size around the table. */
+  function buildPlates() {
+    var table = $('table');
+    T.plates.forEach(function (p) { p.el.remove(); });
+    T.plates = [];
+    var c = MENU[cat];
+    if (!c) return;
+    var n = c.items.length, pages = Math.max(1, Math.ceil(n / T.perPage));
+    T.page = clamp(T.page, 0, pages - 1);
+    var start = T.page * T.perPage, count = Math.min(T.perPage, n - start);
+    for (var j = 0; j < count; j++) {
+      var it = c.items[start + j];
+      var el = document.createElement('button');
+      el.type = 'button';
+      el.className = 'plate';
+      el.tabIndex = -1;
+      el.dataset.i = String(j);
+      el.setAttribute('aria-label', it.name);
+      el.style.setProperty('--c', it.col[0]);
+      el.style.setProperty('--d', it.col[1]);
+      el.innerHTML = faceHTML(it) + '<span class="qty"></span>';
+      table.appendChild(el);
+      T.plates.push({el: el, item: it, a: TAU * j / count});
+    }
+    T.front = -1;
+    T.gFront = -1;
+    render();
     paintAll();
   }
 
-  function buildPlates() {
-    var arc = $('arc');
-    arc.innerHTML = '';
-    var c = MENU[cat];
-    plates = c.items.map(function (it, i) {
-      var b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'plate';
-      b.tabIndex = -1;
-      b.dataset.i = String(i);
-      b.setAttribute('aria-label', it.name);
-      b.style.setProperty('--c', c.colors[0]);
-      b.style.setProperty('--d', c.colors[1]);
-      var face = document.createElement('span');
-      face.className = 'face';
-      var letter = document.createElement('span');
-      letter.textContent = (it.name.charAt(0) || '?').toUpperCase();
-      face.appendChild(letter);
-      if (it.img) {
-        var im = document.createElement('img');
-        im.alt = ''; im.loading = 'lazy'; im.decoding = 'async';
-        im.addEventListener('error', function () { im.style.display = 'none'; });
-        im.src = it.img;
-        face.appendChild(im);
-      }
-      b.appendChild(face);
-      var q = document.createElement('span');
-      q.className = 'qty';
-      b.appendChild(q);
-      arc.appendChild(b);
-      return b;
-    });
-    render();
-  }
-
-  function render() {
-    if (!plates.length) return;
-    var W = $('arc').clientWidth || 360;
-    var cx = W / 2, cy = TOP + S / 2 + R;
-    var cur = clamp(Math.round(pos), 0, plates.length - 1);
-    for (var i = 0; i < plates.length; i++) {
-      var p = plates[i], d = i - pos, ad = Math.abs(d);
-      var th = d * SP / R;
-      var x = cx + R * Math.sin(th), y = cy - R * Math.cos(th);
-      if (ad > 3.4 || x < -S || x > W + S) { p.style.display = 'none'; continue; }
-      var s = 1 - 0.1 * ad + 0.3 * Math.max(0, 1 - ad);
-      p.style.display = 'block';
-      p.style.transform = 'translate(' + (x - S / 2).toFixed(1) + 'px,' + (y - S / 2).toFixed(1) + 'px) scale(' + s.toFixed(3) + ')';
-      p.style.opacity = Math.max(0.25, 1 - 0.26 * ad).toFixed(3);
-      p.style.zIndex = String(100 - Math.round(ad * 10));
-      p.classList.toggle('cur', i === cur);
+  function makeSeams() {
+    var svg = $('seams');
+    for (var k = 0; k < 12; k++) {
+      var ln = document.createElementNS(SVGNS, 'line');
+      svg.appendChild(ln);
+      T.seams.push(ln);
     }
-    var activeNow = Math.round(clamp(pos, 0, plates.length - 1));
-    if (activeNow !== curIdx) { curIdx = activeNow; paintCard(); }
   }
 
-  function paintCard() {
-    if (!MENU[cat]) return;
-    var items = MENU[cat].items, n = items.length;
-    var i = clamp(Math.round(pos), 0, n - 1), it = items[i];
-    var qty = cart.get(it.key) || 0;
-    $('count').textContent = (i + 1) + ' of ' + n + ' · ' + MENU[cat].title;
+  /* ---------- drawing ---------- */
+  function render() {
+    var n = T.plates.length;
+    if (!n) return;
+    var best = -2, bi = 0, i, p, th, v, t, x, y, s;
+    for (i = 0; i < n; i++) {
+      p = T.plates[i];
+      th = wrap(T.ang + p.a);
+      v = Math.cos(th);
+      x = T.cx + T.R0 * Math.sin(th);
+      y = T.cy + T.R0 * TILT * v;
+      t = (v + 1) / 2;
+      s = 0.66 + 0.46 * t;
+      p.el.style.transform = 'translate3d(' + (x - S / 2).toFixed(2) + 'px,' + (y - S / 2).toFixed(2) + 'px,0) scale(' + s.toFixed(3) + ')';
+      p.el.style.opacity = (0.4 + 0.6 * t).toFixed(3);
+      p.el.style.zIndex = String(10 + Math.round(t * 60));
+      if (v > best) { best = v; bi = i; }
+    }
+    for (i = 0; i < n; i++) T.plates[i].el.classList.toggle('front', i === bi);
+    T.front = bi;
+    var g = T.page * T.perPage + bi;
+    if (g !== T.gFront) { T.gFront = g; paintCard(false); }
+    for (i = 0; i < T.seams.length; i++) {
+      var phi = T.ang + i * TAU / T.seams.length, sn = Math.sin(phi), cs = Math.cos(phi), ln = T.seams[i];
+      ln.setAttribute('x1', (T.DX + 0.2 * T.DX * sn).toFixed(1));
+      ln.setAttribute('y1', (T.DY + 0.2 * T.DY * cs).toFixed(1));
+      ln.setAttribute('x2', (T.DX + 0.96 * T.DX * sn).toFixed(1));
+      ln.setAttribute('y2', (T.DY + 0.96 * T.DY * cs).toFixed(1));
+    }
+  }
+
+  function paintCard(swap) {
+    var c = MENU[cat];
+    if (!c || T.gFront < 0 || !c.items[T.gFront]) return;
+    var it = c.items[T.gFront], n = c.items.length, i = T.gFront, q = cart.get(it.key) || 0;
+    $('count').textContent = (i + 1) + ' of ' + n + ' · ' + c.title;
     $('dName').textContent = it.name;
     $('dDesc').textContent = it.desc;
+    $('dDesc').hidden = !it.desc;
     $('dPrice').textContent = ksh(it.price);
-    $('ctl').innerHTML = qty > 0
-      ? '<div class="step" role="group" aria-label="Quantity of ' + esc(it.name) + '"><button type="button" data-act="dec" data-key="' + esc(it.key) + '" aria-label="Remove one">&minus;</button><b aria-live="polite">' + qty + '</b><button type="button" data-act="inc" data-key="' + esc(it.key) + '" aria-label="Add one">+</button></div>'
-      : '<button type="button" class="add" data-act="inc" data-key="' + esc(it.key) + '">Select</button>';
-    $('prev').disabled = i === 0;
-    $('next').disabled = i === n - 1;
+    $('ctl').innerHTML = q > 0
+      ? '<div class="step" role="group" aria-label="Quantity of ' + esc(it.name) + '"><button type="button" data-act="dec" data-key="' + esc(it.key) + '" aria-label="Remove one">&minus;</button><b aria-live="polite">' + q + '</b><button type="button" data-act="inc" data-key="' + esc(it.key) + '" aria-label="Add one">+</button></div>'
+      : '<button type="button" class="add" data-act="select" data-key="' + esc(it.key) + '">Select</button>';
     $('progBar').style.width = ((i + 1) / n * 100).toFixed(2) + '%';
-    plates.forEach(function (p, k) {
-      var q = cart.get(MENU[cat].items[k].key) || 0;
-      p.classList.toggle('on', q > 0);
-      p.querySelector('.qty').textContent = q > 0 ? String(q) : '';
+    if (swap && !reduceMotion) {
+      var card = $('card');
+      card.classList.remove('swap');
+      void card.offsetWidth;
+      card.classList.add('swap');
+    }
+  }
+
+  function paintBadges() {
+    T.plates.forEach(function (p) {
+      var q = cart.get(p.item.key) || 0;
+      p.el.classList.toggle('on', q > 0);
+      p.el.querySelector('.qty').textContent = q > 0 ? String(q) : '';
     });
+  }
+
+  function paintPile() {
+    var keys = Array.from(cart.keys()).filter(function (k) { return keyMap.has(k); }).slice(-4);
+    $('pile').innerHTML = keys.map(function (k, i) {
+      var it = keyMap.get(k);
+      return '<span class="m" style="--c:' + it.col[0] + ';--d:' + it.col[1] + ';transform:translate(-50%,-50%) translateY(' + (-i * 5) + 'px);z-index:' + (i + 1) + '">' + faceHTML(it) + '</span>';
+    }).join('');
   }
 
   function paintTray() {
@@ -399,15 +513,22 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
   function paintSheet() {
     var t = 0, h = '';
     cart.forEach(function (q, k) {
-      var it = keyMap.get(k); if (!it) return;
+      var it = keyMap.get(k);
+      if (!it) return;
       t += q * it.price;
       h += '<div class="line"><span class="ln">' + esc(it.name) + '</span><span class="lt">' + ksh(it.price * q) + '</span><small>' + ksh(it.price) + ' each</small><span class="step"><button type="button" data-act="dec" data-key="' + esc(k) + '" aria-label="Remove one ' + esc(it.name) + '">&minus;</button><b>' + q + '</b><button type="button" data-act="inc" data-key="' + esc(k) + '" aria-label="Add one ' + esc(it.name) + '">+</button></span></div>';
     });
-    $('lines').innerHTML = h || '<p class="note">Nothing added yet.</p>';
+    $('lines').innerHTML = h || '<p class="note">Nothing on your table yet.</p>';
     $('sheetTotal').textContent = ksh(t);
   }
 
-  function paintAll() { paintCard(); paintTray(); if ($('sheet').open) paintSheet(); }
+  function paintAll() {
+    paintCard(false);
+    paintBadges();
+    paintPile();
+    paintTray();
+    if ($('sheet').open) paintSheet();
+  }
 
   function setQty(key, d) {
     var q = Math.max(0, (cart.get(key) || 0) + d);
@@ -416,62 +537,179 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
     paintAll();
   }
 
-  function animateTo(target) {
-    cancelAnimationFrame(anim);
-    var from = pos, start = performance.now(), dur = 300;
-    target = clamp(target, 0, plates.length - 1);
-    var step = function (now) {
-      var k = Math.min(1, (now - start) / dur), e = 1 - Math.pow(1 - k, 3);
-      pos = from + (target - from) * e;
-      render();
-      if (k < 1) anim = requestAnimationFrame(step);
-      else { pos = target; render(); paintCard(); }
-    };
-    anim = requestAnimationFrame(step);
+  function fly(p) {
+    if (reduceMotion || !p.el.animate) return;
+    var from = p.el.getBoundingClientRect();
+    var pile = $('pile').getBoundingClientRect();
+    var ghost = document.createElement('div');
+    ghost.className = 'fly';
+    ghost.style.left = from.left + 'px';
+    ghost.style.top = from.top + 'px';
+    ghost.style.width = from.width + 'px';
+    ghost.style.height = from.height + 'px';
+    ghost.style.setProperty('--c', p.item.col[0]);
+    ghost.style.setProperty('--d', p.item.col[1]);
+    ghost.innerHTML = faceHTML(p.item);
+    document.body.appendChild(ghost);
+    var cx = from.left + from.width / 2, cy = from.top + from.height / 2;
+    var k = 46 / from.width;
+    var a = ghost.animate([
+      {transform: 'translate(0,0) scale(1)', opacity: 1},
+      {transform: 'translate(' + (pile.left - cx) + 'px,' + (pile.top - cy) + 'px) scale(' + k + ')', opacity: 0.1}
+    ], {duration: 460, easing: 'cubic-bezier(.2,.8,.2,1)', fill: 'forwards'});
+    a.onfinish = function () { ghost.remove(); };
   }
 
-  function go(d) { if (plates.length) animateTo(Math.round(pos) + d); }
+  function selectFront() {
+    var p = T.plates[T.front];
+    if (!p) return;
+    fly(p);
+    setQty(p.item.key, 1);
+  }
 
-  var arc = $('arc');
-  arc.addEventListener('pointerdown', function (e) {
-    if (!plates.length) return;
-    cancelAnimationFrame(anim);
+  /* ---------- physics ---------- */
+  function focusAngle(j) { return T.ang - wrap(T.ang + T.plates[j].a); }
+
+  function snapAngle() {
+    var best = Infinity, th0 = 0;
+    T.plates.forEach(function (p) {
+      var th = wrap(T.ang + p.a);
+      if (Math.abs(th) < best) { best = Math.abs(th); th0 = th; }
+    });
+    return T.ang - th0;
+  }
+
+  function kick() {
+    if (!T.raf) { T.last = performance.now(); T.raf = requestAnimationFrame(frame); }
+  }
+
+  function landed() {
+    T.goal = -1;
+    try { if (navigator.vibrate) navigator.vibrate(6); } catch (e) {}
+    paintCard(true);
+  }
+
+  function frame(now) {
+    var dt = clamp((now - T.last) / 1000, 0, 0.034);
+    T.last = now;
+    if (T.drag) { T.raf = 0; return; }
+    if (T.target !== null) {
+      var d = T.target - T.ang;
+      if (Math.abs(d) < 0.0006) { T.ang = T.target; T.target = null; render(); landed(); }
+      else { T.ang += d * (1 - Math.exp(-dt * (reduceMotion ? 40 : 13))); render(); }
+    } else if (Math.abs(T.omega) > 0.03) {
+      T.ang += T.omega * dt;
+      T.omega *= Math.exp(-dt * DRAG_K);
+      render();
+    } else {
+      T.omega = 0;
+      T.target = snapAngle();
+    }
+    if (T.drag || T.target !== null || T.omega !== 0) T.raf = requestAnimationFrame(frame);
+    else T.raf = 0;
+  }
+
+  function phiOf(e) {
+    var r = $('table').getBoundingClientRect();
+    var dx = (e.clientX - r.left - T.cx) / T.R0;
+    var dy = (e.clientY - r.top - T.cy) / (T.R0 * TILT);
+    return Math.atan2(dx, dy);
+  }
+
+  /* spin to a dish on the current page (j = local index) */
+  function goToLocal(j) {
+    T.omega = 0;
+    T.goal = T.page * T.perPage + j;
+    T.target = focusAngle(j);
+    kick();
+  }
+
+  /* spin to any dish in the section (g = section index), switching page when needed */
+  function goToGlobal(g) {
+    var c = MENU[cat];
+    if (!c) return;
+    var n = c.items.length;
+    g = ((g % n) + n) % n;
+    var page = Math.floor(g / T.perPage), local = g - page * T.perPage;
+    T.omega = 0;
+    T.target = null;
+    T.goal = g;
+    if (page !== T.page) { T.page = page; buildPlates(); }
+    T.target = focusAngle(local);
+    kick();
+  }
+
+  function step(dir) {
+    var c = MENU[cat];
+    if (!c) return;
+    var base = T.goal >= 0 ? T.goal : (T.gFront < 0 ? 0 : T.gFront);
+    goToGlobal(base + dir);
+  }
+
+  /* ---------- table input ---------- */
+  var table = $('table');
+  table.addEventListener('pointerdown', function (e) {
+    if (!T.plates.length || (e.button != null && e.button !== 0)) return;
+    T.target = null;
+    T.omega = 0;
+    T.goal = -1;
     var pl = e.target.closest ? e.target.closest('.plate') : null;
-    drag = {x: e.clientX, start: e.clientX, p: pos, moved: 0, target: pl ? +pl.dataset.i : -1};
-    arc.classList.add('drag');
-    try { arc.setPointerCapture(e.pointerId); } catch (err) {}
+    var now = performance.now();
+    T.drag = {x: e.clientX, y: e.clientY, t0: now, phi: phiOf(e), hit: pl ? +pl.dataset.i : -1, moved: 0, samples: [{t: now, ang: T.ang}]};
+    table.classList.add('drag');
+    try { table.setPointerCapture(e.pointerId); } catch (err) {}
   });
-  arc.addEventListener('pointermove', function (e) {
-    if (!drag) return;
-    drag.moved = Math.max(drag.moved, Math.abs(e.clientX - drag.start));
-    var dx = e.clientX - drag.x;
-    pos = clamp(drag.p - dx / SP, 0, plates.length - 1);
+
+  table.addEventListener('pointermove', function (e) {
+    var d = T.drag;
+    if (!d) return;
+    d.moved = Math.max(d.moved, Math.hypot(e.clientX - d.x, e.clientY - d.y));
+    var phi = phiOf(e);
+    T.ang += wrap(phi - d.phi);
+    d.phi = phi;
+    var now = performance.now();
+    d.samples.push({t: now, ang: T.ang});
+    while (d.samples.length > 2 && now - d.samples[0].t > 110) d.samples.shift();
     render();
   });
-  var endDrag = function (e) {
-    if (!drag) return;
-    var d = drag; drag = null;
-    arc.classList.remove('drag');
-    if (d.moved < 6 && d.target > -1) animateTo(d.target);
-    else animateTo(Math.round(pos));
-  };
-  arc.addEventListener('pointerup', endDrag);
-  arc.addEventListener('pointercancel', endDrag);
-  arc.addEventListener('keydown', function (e) {
-    if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+
+  function release() {
+    var d = T.drag;
+    if (!d) return;
+    T.drag = null;
+    table.classList.remove('drag');
+    var now = performance.now();
+    if (d.moved < 8 && now - d.t0 < 450 && d.hit > -1) { goToLocal(d.hit); return; }
+    var a = d.samples[0], b = d.samples[d.samples.length - 1];
+    var span = (b.t - a.t) / 1000;
+    var v = span > 0.012 ? (b.ang - a.ang) / span : 0;
+    T.goal = -1;
+    if (reduceMotion || now - b.t > 90) { T.omega = 0; T.target = snapAngle(); }
+    else T.omega = clamp(v, -MAX_FLING, MAX_FLING);
+    kick();
+  }
+  table.addEventListener('pointerup', release);
+  table.addEventListener('pointercancel', release);
+
+  table.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); step(e.key === 'ArrowRight' ? 1 : -1); }
+    else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectFront(); }
   });
-  $('prev').addEventListener('click', function () { go(-1); });
-  $('next').addEventListener('click', function () { go(1); });
+
+  /* ---------- controls ---------- */
+  $('prev').addEventListener('click', function () { step(-1); });
+  $('next').addEventListener('click', function () { step(1); });
 
   $('cats').addEventListener('click', function (e) {
     var t = e.target.closest('.cat');
-    if (t) setCat(+t.dataset.i, false);
+    if (t) setCat(+t.dataset.i);
   });
 
   $('ctl').addEventListener('click', function (e) {
     var b = e.target.closest('[data-act]');
-    if (b) setQty(b.dataset.key, b.dataset.act === 'dec' ? -1 : 1);
+    if (!b) return;
+    if (b.dataset.act === 'select') selectFront();
+    else setQty(b.dataset.key, b.dataset.act === 'dec' ? -1 : 1);
   });
 
   $('lines').addEventListener('click', function (e) {
@@ -480,19 +718,28 @@ dialog h3{font:800 1.6rem/1.1 'Bricolage Grotesque',sans-serif;font-stretch:75%;
   });
 
   $('tray').addEventListener('click', function () { paintSheet(); $('sheet').showModal(); });
+
   document.addEventListener('click', function (e) {
     if (e.target.closest('[data-clear]')) { cart.clear(); saveCart(); paintAll(); $('sheet').close(); }
-    else if (e.target.closest('[data-close]')) $('sheet').close();
+    else if (e.target.closest('[data-close]')) { $('sheet').close(); }
     else if (e.target.closest('[data-retry]')) { SIG = ''; load(); }
   });
+
   $('sheet').addEventListener('click', function (e) {
     if (e.target === $('sheet')) $('sheet').close();
   });
 
-  window.addEventListener('resize', function () { render(); });
+  window.addEventListener('resize', function () {
+    if (!MENU.length) return;
+    var g = T.gFront;
+    geometry();
+    if (g >= 0) T.page = Math.floor(g / T.perPage);
+    buildPlates();
+  });
   window.addEventListener('focus', function () { load(); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
 
+  makeSeams();
   load();
 })();
 </script>
